@@ -75,6 +75,9 @@ Setelah itu akan muncul ikon hijau "Toko Arief" di layar HP seperti aplikasi bia
 4. Tekan **Bayar**, masukkan uang yang diterima (atau tekan "Uang Pas"), kembalian otomatis muncul.
 5. Tekan **Selesai & Simpan** — transaksi tersimpan, bisa dibagikan ke WhatsApp pembeli kalau mau.
 
+### Cek harga tanpa transaksi (menu Cek Harga)
+Buat yang cuma mau tahu harga suatu barang (misalnya pembeli nanya duluan sebelum beli, atau titik cek harga mandiri): buka menu **Cek Harga**, scan barcode-nya atau ketik nama produknya, harga langsung tampil besar (3 tingkat sekaligus) tanpa masuk keranjang belanja. Kalau ternyata jadi dibeli, tinggal tekan **Tambah ke Kasir** dan barangnya otomatis pindah ke keranjang kasir.
+
 ### Mengelola produk & stok (menu Produk)
 Tambah produk baru, ubah harga (3 tingkat + harga modal), tambah stok cepat saat barang baru datang, atau nonaktifkan produk yang sudah tidak dijual.
 

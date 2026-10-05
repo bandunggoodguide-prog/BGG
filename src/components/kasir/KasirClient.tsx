@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import CustomerTypeSelector from "./CustomerTypeSelector";
 import ProductGrid from "./ProductGrid";
 import CartSheet from "./CartSheet";
@@ -11,6 +12,8 @@ import { priceForCustomerType } from "@/lib/pricing";
 import type { CartItem, CustomerType, Product } from "@/lib/types";
 
 export default function KasirClient() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [customerType, setCustomerType] = useState<CustomerType>("UMUM");
@@ -33,6 +36,19 @@ export default function KasirClient() {
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
+
+  // Jembatan dari halaman Cek Harga: ?tambah=<productId> otomatis masuk keranjang.
+  const handledTambahRef = useRef<string | null>(null);
+  useEffect(() => {
+    const tambahId = searchParams.get("tambah");
+    if (!tambahId || products.length === 0) return;
+    if (handledTambahRef.current === tambahId) return;
+    handledTambahRef.current = tambahId;
+    const product = products.find((p) => p.id === tambahId);
+    if (product) addToCart(product);
+    router.replace("/kasir");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products, searchParams]);
 
   useEffect(() => {
     if (!toast) return;

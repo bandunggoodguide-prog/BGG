@@ -31,10 +31,18 @@ const ICONS: Record<string, ReactElement> = {
       <path d="M7 15l4-5 3 3 5-7" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
+  cekharga: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
+      <path d="M11 8v3l2 2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
 };
 
 const ITEMS = [
   { href: "/kasir", label: "Kasir", icon: "kasir" },
+  { href: "/cek-harga", label: "Cek Harga", icon: "cekharga" },
   { href: "/produk", label: "Produk", icon: "produk" },
   { href: "/riwayat", label: "Riwayat", icon: "riwayat" },
   { href: "/laporan", label: "Laporan", icon: "laporan" },
