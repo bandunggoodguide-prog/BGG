@@ -1,46 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ApiAuthError, requireApiSession } from "@/lib/auth";
-import { sanitizeProductForRole } from "@/lib/serialize";
 
 export async function GET(request: NextRequest) {
-  try {
-    const session = await requireApiSession();
-    const { searchParams } = new URL(request.url);
-    const q = searchParams.get("q")?.trim();
-    const category = searchParams.get("category")?.trim();
-    const onlyActive = searchParams.get("all") !== "1";
+  const { searchParams } = new URL(request.url);
+  const q = searchParams.get("q")?.trim();
+  const category = searchParams.get("category")?.trim();
+  const onlyActive = searchParams.get("all") !== "1";
 
-    const products = await prisma.product.findMany({
-      where: {
-        ...(onlyActive ? { active: true } : {}),
-        ...(category ? { category } : {}),
-        ...(q
-          ? {
-              OR: [
-                { name: { contains: q, mode: "insensitive" } },
-                { barcode: { contains: q } },
-              ],
-            }
-          : {}),
-      },
-      orderBy: { name: "asc" },
-    });
+  const products = await prisma.product.findMany({
+    where: {
+      ...(onlyActive ? { active: true } : {}),
+      ...(category ? { category } : {}),
+      ...(q
+        ? {
+            OR: [
+              { name: { contains: q, mode: "insensitive" } },
+              { barcode: { contains: q } },
+            ],
+          }
+        : {}),
+    },
+    orderBy: { name: "asc" },
+  });
 
-    return NextResponse.json({
-      products: products.map((p) => sanitizeProductForRole(p, session.role)),
-    });
-  } catch (err) {
-    if (err instanceof ApiAuthError) {
-      return NextResponse.json({ error: err.message }, { status: err.status });
-    }
-    throw err;
-  }
+  return NextResponse.json({ products });
 }
 
 export async function POST(request: NextRequest) {
   try {
-    await requireApiSession("OWNER");
     const body = await request.json();
 
     const name = String(body.name ?? "").trim();
@@ -88,9 +75,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (err) {
-    if (err instanceof ApiAuthError) {
-      return NextResponse.json({ error: err.message }, { status: err.status });
-    }
     if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2002") {
       return NextResponse.json({ error: "Barcode sudah dipakai produk lain" }, { status: 409 });
     }

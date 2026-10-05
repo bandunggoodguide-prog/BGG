@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { formatDateTime, formatRupiah, customerTypeLabel } from "@/lib/format";
 import ReceiptView, { type ReceiptData } from "@/components/ReceiptView";
-import type { Role } from "@/lib/auth";
 
 type TxItem = { productName: string; qty: number; unitPrice: number; subtotal: number };
 type Tx = {
@@ -13,10 +12,9 @@ type Tx = {
   customerType: string;
   customerNote: string | null;
   totalAmount: number;
-  totalCost: number | null;
+  totalCost: number;
   cashReceived: number | null;
   changeAmount: number | null;
-  cashier: { name: string };
   items: TxItem[];
 };
 
@@ -32,7 +30,7 @@ const BADGE_CLASS: Record<string, string> = {
   DONASI: "bg-pink-50 text-pink-700",
 };
 
-export default function RiwayatClient({ role }: { role: Role }) {
+export default function RiwayatClient() {
   const [preset, setPreset] = useState<(typeof PRESETS)[number]["key"]>("today");
   const [transactions, setTransactions] = useState<Tx[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,7 +95,7 @@ export default function RiwayatClient({ role }: { role: Role }) {
               </span>
             </div>
             <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>{formatDateTime(t.createdAt)} · {t.cashier.name}</span>
+              <span>{formatDateTime(t.createdAt)}</span>
               <span className="font-bold text-slate-900 text-sm">{formatRupiah(t.totalAmount)}</span>
             </div>
           </button>
@@ -115,12 +113,10 @@ export default function RiwayatClient({ role }: { role: Role }) {
               <button onClick={() => setSelected(null)} className="text-slate-400 text-sm">Tutup</button>
             </div>
             <ReceiptView data={selected as unknown as ReceiptData} />
-            {role === "OWNER" && selected.totalCost !== null && (
-              <div className="bg-white rounded-2xl p-4 border border-slate-100 mt-3 flex justify-between">
-                <span className="text-sm text-slate-500">Keuntungan transaksi ini</span>
-                <span className="font-bold text-brand-700">{formatRupiah(selected.totalAmount - selected.totalCost)}</span>
-              </div>
-            )}
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 mt-3 flex justify-between">
+              <span className="text-sm text-slate-500">Keuntungan transaksi ini</span>
+              <span className="font-bold text-brand-700">{formatRupiah(selected.totalAmount - selected.totalCost)}</span>
+            </div>
           </div>
         </div>
       )}

@@ -17,7 +17,6 @@ export type ReceiptData = {
   totalAmount: number;
   cashReceived?: number | null;
   changeAmount?: number | null;
-  cashier?: { name: string } | null;
   items: ReceiptItem[];
 };
 
@@ -45,12 +44,11 @@ export default function ReceiptView({ data }: { data: ReceiptData }) {
   return (
     <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-5 font-mono text-sm">
       <div className="text-center mb-3">
-        <p className="font-bold text-base">WARUNG KITA</p>
+        <p className="font-bold text-base">TOKO ARIEF</p>
         <p className="text-xs text-slate-500">{data.code}</p>
         <p className="text-xs text-slate-500">{formatDateTime(data.createdAt)}</p>
       </div>
-      <div className="flex justify-between text-xs text-slate-600 mb-2 border-b border-dashed border-slate-300 pb-2">
-        <span>Kasir: {data.cashier?.name ?? "-"}</span>
+      <div className="flex justify-end text-xs text-slate-600 mb-2 border-b border-dashed border-slate-300 pb-2">
         <span>{customerTypeLabel(data.customerType)}</span>
       </div>
       {data.customerNote && <p className="text-xs text-slate-500 mb-2">Catatan: {data.customerNote}</p>}

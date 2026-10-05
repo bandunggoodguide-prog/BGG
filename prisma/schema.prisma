@@ -7,21 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Role is stored as plain string ("OWNER" | "EMPLOYEE") instead of a native
-// enum so the schema stays portable (SQLite, used for quick local testing,
-// has no enum support).
-model User {
-  id        String   @id @default(cuid())
-  name      String
-  pinHash   String
-  role      String // "OWNER" | "EMPLOYEE"
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-
-  transactions Transaction[]
-  stockMoves   StockMovement[]
-}
-
 model Product {
   id            String   @id @default(cuid())
   name          String
@@ -41,25 +26,23 @@ model Product {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  items        TransactionItem[]
-  stockMoves   StockMovement[]
+  items      TransactionItem[]
+  stockMoves StockMovement[]
 
   @@index([name])
   @@index([category])
 }
 
 model Transaction {
-  id            String   @id @default(cuid())
-  code          String   @unique // nomor struk tampilan, misal GRS-20260105-0001
-  cashierId     String
-  cashier       User     @relation(fields: [cashierId], references: [id])
-  customerType  String // "UMUM" | "B2B" | "DONASI"
-  customerNote  String? // nama pembeli B2B / penerima donasi (opsional)
-  totalAmount   Int // total harga jual
-  totalCost     Int // total harga modal (utk hitung profit, owner only)
-  cashReceived  Int?
-  changeAmount  Int?
-  createdAt     DateTime @default(now())
+  id           String   @id @default(cuid())
+  code         String   @unique // nomor struk tampilan, misal GRS-20260105-0001
+  customerType String // "UMUM" | "B2B" | "DONASI"
+  customerNote String? // nama pembeli B2B / penerima donasi (opsional)
+  totalAmount  Int // total harga jual
+  totalCost    Int // total harga modal (untuk hitung keuntungan)
+  cashReceived Int?
+  changeAmount Int?
+  createdAt    DateTime @default(now())
 
   items TransactionItem[]
 
@@ -68,16 +51,16 @@ model Transaction {
 }
 
 model TransactionItem {
-  id              String @id @default(cuid())
-  transactionId   String
-  transaction     Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
-  productId       String
-  product         Product @relation(fields: [productId], references: [id])
-  productName     String // disalin saat transaksi, jaga histori jika produk diubah/dihapus
-  qty             Float
-  unitPrice       Int // harga jual per unit saat transaksi (sesuai tier)
-  unitCost        Int // harga modal per unit saat transaksi
-  subtotal        Int
+  id            String      @id @default(cuid())
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id])
+  productName   String // disalin saat transaksi, jaga histori jika produk diubah/dihapus
+  qty           Float
+  unitPrice     Int // harga jual per unit saat transaksi (sesuai tier)
+  unitCost      Int // harga modal per unit saat transaksi
+  subtotal      Int
 
   @@index([productId])
   @@index([transactionId])
@@ -90,8 +73,6 @@ model StockMovement {
   type      String // "RESTOCK" | "ADJUST" | "SALE"
   qty       Float // positif = masuk, negatif = keluar
   note      String?
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 
   @@index([productId])

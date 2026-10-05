@@ -1,25 +1,26 @@
-# Warung Kita — Aplikasi Kasir & Stok untuk Warung Grosir
+# Toko Arief — Aplikasi Kasir & Stok
 
-Aplikasi kasir sederhana yang bisa dibuka lewat browser HP (seperti buka Instagram/WhatsApp), tanpa perlu install dari Play Store. Dibuat khusus supaya **mudah dipakai orang yang tidak terbiasa pakai komputer**.
+Aplikasi kasir sederhana yang bisa dibuka lewat browser HP (seperti buka Instagram/WhatsApp), tanpa perlu install dari Play Store dan **tanpa login/PIN** — buka langsung bisa dipakai.
 
 ## Fitur Utama
 
 - **3 tingkat harga otomatis**: Umum (pembeli biasa), Grosir/B2B (antar warung), Donasi (harga spesial sosial). Tinggal pilih jenis pembeli, semua harga di keranjang otomatis menyesuaikan.
-- **Scan barcode pakai kamera HP** untuk produk kemasan pabrik (mie instan, sabun, minuman, dll), ditambah **grid tombol gambar** untuk barang curah/eceran tanpa barcode (beras, gula, cabai, bawang, dll). Mendukung juga alat scanner barcode USB/Bluetooth kalau nanti warung mau pakai.
+- **Scan barcode pakai kamera HP** untuk produk kemasan pabrik (mie instan, sabun, minuman, dll), ditambah **grid tombol gambar** untuk barang curah/eceran tanpa barcode (beras, gula, cabai, bawang, dll). Mendukung juga alat scanner barcode USB/Bluetooth kalau nanti mau pakai.
 - **Keranjang & total otomatis** — tidak perlu hitung manual pakai kalkulator. Tinggal tap produk, total langsung muncul.
 - **Pembayaran & kembalian otomatis dihitung**, hasilnya tersimpan sebagai "struk digital" di sistem (tidak perlu printer), dan bisa dibagikan ke pembeli lewat WhatsApp kalau mau.
 - **Rekap stok otomatis**: produk apa yang paling laku, mana yang "stuck" (modal mengendap, tidak laku), dan daftar prioritas belanja/restock supaya tidak kehabisan barang penting.
-- **2 jenis akses**: Pemilik (lihat semua termasuk keuntungan & kelola harga) dan Pegawai (hanya kasir, lihat stok, tambah stok — tidak bisa lihat untung/modal).
-- **Login pakai PIN angka** (bukan email/password) — tinggal pilih nama lalu masukkan PIN 4-6 digit, cocok untuk yang tidak terbiasa internet.
+- **Semua data bisa diunduh sendiri** langsung dari aplikasi (menu Laporan → Unduh Data) dalam format CSV (bisa dibuka di Excel/Google Sheets) — baik riwayat transaksi maupun daftar produk & stok.
 - Bisa **"ditambahkan ke Layar Utama HP"** supaya tampil seperti aplikasi asli dengan ikon sendiri (PWA).
+
+> Tidak ada sistem login/peran (pemilik vs pegawai) — aplikasi ini dibuat untuk dipakai sendiri. Lihat bagian **Keamanan** di bawah untuk hal penting yang perlu diketahui soal ini.
 
 ---
 
 ## 1. Cara Mengaktifkan Aplikasi Ini (Online, Gratis)
 
-Aplikasi ini perlu di-"deploy" (dipasang ke internet) satu kali saja. Setelah itu, pemilik dan pegawai tinggal buka alamat websitenya dari browser HP masing-masing — tidak perlu install ulang apa pun.
+Aplikasi ini perlu di-"deploy" (dipasang ke internet) satu kali saja. Setelah itu, tinggal buka alamat websitenya dari browser HP — tidak perlu install ulang apa pun.
 
-Butuh waktu sekitar 15-20 menit, dan **gratis** (untuk skala 1 warung, jauh di bawah batas gratis layanan yang dipakai). Kalau ada kenalan yang agak paham teknologi (anak muda di desa, misalnya), proses ini paling enak diminta bantuan sekali saja di awal.
+Butuh waktu sekitar 15-20 menit, dan **gratis** (untuk skala 1 toko, jauh di bawah batas gratis layanan yang dipakai).
 
 ### Yang dibutuhkan
 - Akun GitHub (gratis, buat di [github.com](https://github.com))
@@ -39,9 +40,8 @@ Butuh waktu sekitar 15-20 menit, dan **gratis** (untuk skala 1 warung, jauh di b
 3. **Deploy ke Vercel**
    - Masuk ke [vercel.com](https://vercel.com), klik **Add New → Project**.
    - Pilih repository GitHub yang tadi diunggah.
-   - Sebelum klik Deploy, buka bagian **Environment Variables**, lalu tambahkan dua variabel:
+   - Sebelum klik Deploy, buka bagian **Environment Variables**, lalu tambahkan satu variabel:
      - `DATABASE_URL` → tempel connection string dari Neon tadi
-     - `SESSION_SECRET` → isi dengan teks acak yang panjang (minimal 32 karakter, bebas, contoh: `rahasia-warung-kita-2026-jangan-disebar-xyz123`)
    - Klik **Deploy**, tunggu beberapa menit sampai selesai.
 
 4. **Siapkan isi database (sekali saja)**
@@ -51,39 +51,21 @@ Butuh waktu sekitar 15-20 menit, dan **gratis** (untuk skala 1 warung, jauh di b
      npx prisma migrate deploy
      npm run prisma:seed
      ```
-   - Perintah `prisma:seed` akan membuat 1 akun Pemilik contoh dan beberapa produk contoh, supaya langsung bisa dicoba. **Lihat bagian "Login Pertama Kali" di bawah untuk PIN default.**
+   - Perintah `prisma:seed` akan memasukkan beberapa produk contoh, supaya langsung bisa dicoba. Produk contoh ini bisa dihapus/diganti lewat menu **Produk** di aplikasi.
 
-5. **Selesai!** Vercel akan memberi alamat website, misalnya `https://warung-kita.vercel.app`. Alamat inilah yang dibuka dari HP pemilik & pegawai.
+5. **Selesai!** Vercel akan memberi alamat website, misalnya `https://toko-arief.vercel.app`. Alamat inilah yang dibuka dari HP.
 
 > Kalau butuh bantuan teknis saat deploy, tunjukkan file ini ke siapa pun yang membantu — semua langkah di atas standar dan terdokumentasi resmi di situs Vercel & Neon.
 
 ---
 
-## 2. Login Pertama Kali
-
-Setelah `npm run prisma:seed` dijalankan, ada 3 akun contoh:
-
-| Nama | Peran | PIN |
-|---|---|---|
-| Bu Siti (Pemilik) | Pemilik | `123456` |
-| Kasir Warung | Pegawai | `111111` |
-| Dedi | Pegawai | `222222` |
-
-**PENTING — lakukan segera setelah login pertama kali sebagai Pemilik:**
-1. Buka menu **Akun → Kelola Pengguna & Pegawai**.
-2. Edit nama "Bu Siti (Pemilik)" jadi nama pemilik asli, dan ganti PIN-nya ke PIN rahasia sendiri.
-3. Ganti nama & PIN pegawai contoh sesuai pegawai asli, atau hapus (nonaktifkan) kalau tidak dipakai, lalu tambah pegawai sungguhan lewat tombol "+".
-4. Hapus produk-produk contoh dan ganti dengan daftar barang warung yang sebenarnya lewat menu **Produk**.
-
----
-
-## 3. Cara Pakai Sehari-hari
+## 2. Cara Pakai Sehari-hari
 
 ### Menambahkan ke Layar Utama HP (supaya seperti aplikasi asli)
 - **Android (Chrome):** buka alamat website → titik tiga di pojok kanan atas → "Tambahkan ke Layar Utama" / "Install aplikasi".
 - **iPhone (Safari):** buka alamat website → tombol Bagikan (kotak dengan panah ke atas) → "Tambah ke Layar Utama".
 
-Setelah itu akan muncul ikon hijau "Warung Kita" di layar HP seperti aplikasi biasa.
+Setelah itu akan muncul ikon hijau "Toko Arief" di layar HP seperti aplikasi biasa — buka langsung masuk ke kasir, tidak ada layar login.
 
 ### Menjual barang (menu Kasir)
 1. Pilih jenis pembeli dulu: **Umum / Grosir / Donasi**.
@@ -93,34 +75,45 @@ Setelah itu akan muncul ikon hijau "Warung Kita" di layar HP seperti aplikasi bi
 5. Tekan **Selesai & Simpan** — transaksi tersimpan, bisa dibagikan ke WhatsApp pembeli kalau mau.
 
 ### Mengelola produk & stok (menu Produk)
-- Pegawai bisa membuka produk untuk **melihat stok** dan **menambah stok** saat barang baru datang (tanpa bisa ubah harga).
-- Pemilik bisa menambah produk baru, mengubah harga (3 tingkat + harga modal), mengubah stok, dan menonaktifkan produk yang sudah tidak dijual.
+Tambah produk baru, ubah harga (3 tingkat + harga modal), tambah stok cepat saat barang baru datang, atau nonaktifkan produk yang sudah tidak dijual.
 
 ### Melihat riwayat transaksi (menu Riwayat)
-Semua transaksi tercatat otomatis seperti struk digital, bisa difilter per hari/7 hari/30 hari.
+Semua transaksi tercatat otomatis seperti struk digital, bisa difilter per hari/7 hari/30 hari, lengkap dengan keuntungan per transaksi.
 
-### Melihat laporan & rekomendasi restock (menu Laporan — khusus Pemilik)
+### Melihat laporan & rekomendasi restock (menu Laporan)
 - Omzet, keuntungan, jumlah transaksi, dan nilai subsidi yang sudah diberikan lewat harga Donasi.
 - Penjualan per jenis pembeli (Umum/Grosir/Donasi).
 - **Produk Terlaris** — barang yang paling cepat habis.
-- **Prioritas Restock** — daftar barang yang stoknya akan habis dalam beberapa hari (berdasarkan kecepatan jual), dan daftar barang yang **stuck** (modal mengendap karena tidak laku-laku), supaya belanja stok baru lebih strategis.
+- **Prioritas Restock** — daftar barang yang stoknya akan habis dalam beberapa hari (berdasarkan kecepatan jual), dan daftar barang yang **stuck** (modal mengendap karena tidak laku-laku).
+- **Unduh Data** — unduh seluruh riwayat transaksi dan daftar produk sebagai file CSV, langsung dari HP, kapan saja.
 
 ---
 
-## 4. Catatan Tentang Scan Barcode
+## 3. Catatan Tentang Scan Barcode
 
 - Untuk barang kemasan pabrik (ada barcode di bungkusnya), tekan tombol scan, arahkan kamera HP ke barcode — otomatis masuk keranjang.
 - Untuk barang curah/eceran tanpa barcode (beras, gula, cabai, bawang, dsb), cukup **tap gambar produknya** di daftar — tidak perlu scan.
 - Fitur scan kamera butuh koneksi HTTPS (alamat Vercel sudah otomatis HTTPS, jadi aman dipakai) dan izin kamera — browser akan tanya izin sekali di awal, pilih "Izinkan".
-- Kalau nanti warung mau pakai alat scanner barcode fisik (USB/Bluetooth, harga murah di marketplace), tinggal tap kotak pencarian lalu scan — alat tersebut otomatis mengisi kotak pencarian seperti mengetik, dan barang langsung masuk keranjang.
+- Kalau nanti mau pakai alat scanner barcode fisik (USB/Bluetooth, harga murah di marketplace), tinggal tap kotak pencarian lalu scan — alat tersebut otomatis mengisi kotak pencarian seperti mengetik, dan barang langsung masuk keranjang.
 
 ---
 
-## 5. Keamanan
+## 4. Keamanan — Penting Dibaca
 
-- Jangan bagikan `SESSION_SECRET` ke siapa pun — ini kunci rahasia supaya sesi login tidak bisa dipalsukan.
-- Segera ganti semua PIN default setelah instalasi pertama.
-- PIN pegawai sebaiknya beda-beda per orang, supaya kalau ada barang hilang/selisih kas, pemilik tahu siapa kasir yang bertugas saat itu (tercatat otomatis di setiap transaksi).
+Aplikasi ini **sengaja tanpa login/PIN** supaya cepat dipakai. Konsekuensinya: **siapa pun yang tahu alamat websitenya bisa membuka, melihat, dan mengubah semua data** (termasuk harga, stok, dan riwayat transaksi) — karena ini aplikasi online yang bisa diakses dari internet.
+
+Supaya aman:
+- **Jangan sebar alamat website-nya** ke orang lain selain yang memang perlu akses (anggap seperti kunci toko).
+- Simpan alamatnya hanya di HP yang dipakai sendiri (bookmark / ikon di layar utama).
+- Kalau alamatnya pernah ter-share atau khawatir bocor, bisa redeploy ke alamat Vercel yang baru kapan saja.
+
+Kalau suatu saat butuh tambahan proteksi tanpa login per-pengguna, opsi paling simpel adalah mengaktifkan **Vercel Deployment Protection** (fitur bawaan Vercel, perlu paket berbayar) atau menambahkan satu kata sandi tunggal untuk seluruh aplikasi — tinggal bilang saja kalau nanti mau ditambahkan.
+
+---
+
+## 5. Menghubungkan ke Email (Rencana ke Depan)
+
+Karena aplikasi ini kode sendiri (bukan fitur bawaan Claude), nantinya **bisa** dihubungkan ke layanan email terpisah untuk, misalnya, mengirim laporan harian otomatis — sepenuhnya independen, tidak butuh Claude sama sekali. Caranya nanti: pakai layanan seperti [Resend](https://resend.com) atau Gmail SMTP, dengan API key milik sendiri, lalu ditambahkan sebagai fitur baru di aplikasi ini (mirip seperti fitur Unduh Data, tinggal tambah satu endpoint baru yang mengirim email berisi lampiran CSV). Fitur ini belum dibuat — baru disiapkan supaya gampang ditambah kapan saja dibutuhkan.
 
 ---
 
@@ -130,17 +123,18 @@ Dijalankan secara lokal untuk pengembangan:
 
 ```bash
 npm install
-cp .env.example .env   # isi DATABASE_URL (PostgreSQL) & SESSION_SECRET
+cp .env.example .env   # isi DATABASE_URL (PostgreSQL)
 npx prisma migrate dev
 npm run prisma:seed
 npm run dev
 ```
 
-**Stack**: Next.js 16 (App Router) + TypeScript + Tailwind CSS + Prisma + PostgreSQL. Scan barcode pakai `html5-qrcode`. Sesi login pakai JWT di cookie httpOnly (`jose`), PIN di-hash pakai `bcryptjs`.
+**Stack**: Next.js 16 (App Router) + TypeScript + Tailwind CSS + Prisma + PostgreSQL. Scan barcode pakai `html5-qrcode`. Tidak ada autentikasi — semua endpoint API terbuka (lihat bagian Keamanan di atas).
 
 Struktur penting:
-- `prisma/schema.prisma` — model database (User, Product, Transaction, TransactionItem, StockMovement)
+- `prisma/schema.prisma` — model database (Product, Transaction, TransactionItem, StockMovement)
 - `src/lib/restock.ts` — logika perhitungan prioritas restock & produk stuck
 - `src/lib/pricing.ts` — logika pemilihan harga sesuai tingkat pembeli
-- `src/app/api/**` — semua endpoint API, dengan pengecekan peran (OWNER/EMPLOYEE) di tiap endpoint sensitif
+- `src/lib/csv.ts` — util pembuatan file CSV untuk fitur unduh data
+- `src/app/api/**` — semua endpoint API (tanpa autentikasi)
 - `src/components/kasir/KasirClient.tsx` — layar kasir (inti aplikasi)

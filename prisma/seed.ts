@@ -1,16 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
-
-async function upsertUser(name: string, pin: string, role: "OWNER" | "EMPLOYEE") {
-  const pinHash = await bcrypt.hash(pin, 10);
-  const existing = await prisma.user.findFirst({ where: { name } });
-  if (existing) {
-    return prisma.user.update({ where: { id: existing.id }, data: { pinHash, role, active: true } });
-  }
-  return prisma.user.create({ data: { name, pinHash, role } });
-}
 
 type SeedProduct = {
   name: string;
@@ -53,10 +43,6 @@ const products: SeedProduct[] = [
 ];
 
 async function main() {
-  const owner = await upsertUser("Bu Siti (Pemilik)", "123456", "OWNER");
-  await upsertUser("Kasir Warung", "111111", "EMPLOYEE");
-  await upsertUser("Dedi", "222222", "EMPLOYEE");
-
   for (const p of products) {
     const existing = p.barcode ? await prisma.product.findUnique({ where: { barcode: p.barcode } }) : await prisma.product.findFirst({ where: { name: p.name } });
     if (existing) {
@@ -66,14 +52,12 @@ async function main() {
     const created = await prisma.product.create({ data: { ...p, barcode: p.barcode ?? null } });
     if (created.stock > 0) {
       await prisma.stockMovement.create({
-        data: { productId: created.id, type: "RESTOCK", qty: created.stock, note: "Stok awal (seed)", userId: owner.id },
+        data: { productId: created.id, type: "RESTOCK", qty: created.stock, note: "Stok awal (seed)" },
       });
     }
   }
 
-  console.log("Seed selesai.");
-  console.log("Login Pemilik: PIN 123456");
-  console.log("Login Pegawai: Kasir Warung PIN 111111 / Dedi PIN 222222");
+  console.log("Seed selesai: produk contoh sudah dimasukkan.");
 }
 
 main()

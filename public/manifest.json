@@ -1,7 +1,7 @@
 {
-  "name": "Warung Kita - Kasir & Stok",
-  "short_name": "Warung Kita",
-  "description": "Aplikasi kasir, harga 3 tingkat, dan rekap stok untuk warung grosir",
+  "name": "Toko Arief - Kasir & Stok",
+  "short_name": "Toko Arief",
+  "description": "Aplikasi kasir, harga 3 tingkat, dan rekap stok untuk Toko Arief",
   "start_url": "/kasir",
   "display": "standalone",
   "background_color": "#f8fafc",

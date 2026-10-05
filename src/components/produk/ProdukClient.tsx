@@ -4,10 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getProductEmoji, getColorClass } from "@/lib/icons";
 import { formatRupiah, formatQty } from "@/lib/format";
 import type { Product } from "@/lib/types";
-import type { Role } from "@/lib/auth";
 import ProductFormModal from "./ProductFormModal";
 
-export default function ProdukClient({ role }: { role: Role }) {
+export default function ProdukClient() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -54,14 +53,12 @@ export default function ProdukClient({ role }: { role: Role }) {
           placeholder="Cari produk..."
           className="flex-1 h-12 rounded-2xl border border-slate-200 bg-white px-4 text-sm"
         />
-        {role === "OWNER" && (
-          <button
-            onClick={() => setCreating(true)}
-            className="btn-tap w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-2xl font-bold shrink-0"
-          >
-            +
-          </button>
-        )}
+        <button
+          onClick={() => setCreating(true)}
+          className="btn-tap w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-2xl font-bold shrink-0"
+        >
+          +
+        </button>
       </div>
 
       {loading && <p className="text-center text-slate-400 py-10">Memuat produk...</p>}
@@ -100,7 +97,6 @@ export default function ProdukClient({ role }: { role: Role }) {
       {(editing || creating) && (
         <ProductFormModal
           mode={creating ? "create" : "edit"}
-          role={role}
           product={editing ?? undefined}
           categories={categories}
           onClose={closeModal}

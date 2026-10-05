@@ -43,12 +43,15 @@ export default function LaporanClient() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [restock, setRestock] = useState<RestockReport | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"ringkasan" | "restock">("ringkasan");
+  const [tab, setTab] = useState<"ringkasan" | "restock" | "unduh">("ringkasan");
+
+  const days = RANGE_PRESETS.find((r) => r.key === range)!.days;
+  const rangeTo = new Date();
+  const rangeFrom = new Date(rangeTo.getTime() - days * 24 * 60 * 60 * 1000);
 
   useEffect(() => {
-    const days = RANGE_PRESETS.find((r) => r.key === range)!.days;
-    const to = new Date();
-    const from = new Date(to.getTime() - days * 24 * 60 * 60 * 1000);
+    const to = rangeTo;
+    const from = rangeFrom;
     setLoading(true);
     Promise.all([
       fetch(`/api/reports/summary?from=${from.toISOString()}&to=${to.toISOString()}`).then((r) => r.json()),
@@ -90,7 +93,13 @@ export default function LaporanClient() {
           onClick={() => setTab("restock")}
           className={`btn-tap flex-1 h-10 rounded-xl text-sm font-bold ${tab === "restock" ? "bg-brand-600 text-white" : "bg-white border border-slate-200 text-slate-500"}`}
         >
-          Prioritas Restock {restock && restock.urgent.length > 0 ? `(${restock.urgent.length})` : ""}
+          Restock {restock && restock.urgent.length > 0 ? `(${restock.urgent.length})` : ""}
+        </button>
+        <button
+          onClick={() => setTab("unduh")}
+          className={`btn-tap flex-1 h-10 rounded-xl text-sm font-bold ${tab === "unduh" ? "bg-brand-600 text-white" : "bg-white border border-slate-200 text-slate-500"}`}
+        >
+          Unduh Data
         </button>
       </div>
 
@@ -178,6 +187,42 @@ export default function LaporanClient() {
               </div>
             </section>
           )}
+        </div>
+      )}
+
+      {tab === "unduh" && (
+        <div className="space-y-4">
+          <section className="bg-white rounded-2xl p-4 border border-slate-100">
+            <p className="font-bold mb-1">Unduh Transaksi</p>
+            <p className="text-xs text-slate-500 mb-3">
+              Semua transaksi pada periode {RANGE_PRESETS.find((r) => r.key === range)?.label.toLowerCase()} terakhir
+              ({rangeFrom.toLocaleDateString("id-ID")} – {rangeTo.toLocaleDateString("id-ID")}), per barang yang terjual,
+              dalam format CSV (bisa dibuka di Excel / Google Sheets).
+            </p>
+            <a
+              href={`/api/export/transactions?from=${rangeFrom.toISOString()}&to=${rangeTo.toISOString()}`}
+              className="btn-tap w-full h-12 rounded-2xl bg-brand-600 text-white font-bold flex items-center justify-center gap-2"
+            >
+              Unduh Transaksi (CSV)
+            </a>
+          </section>
+
+          <section className="bg-white rounded-2xl p-4 border border-slate-100">
+            <p className="font-bold mb-1">Unduh Daftar Produk</p>
+            <p className="text-xs text-slate-500 mb-3">
+              Seluruh produk beserta stok, harga, dan modal saat ini, dalam format CSV.
+            </p>
+            <a
+              href="/api/export/products"
+              className="btn-tap w-full h-12 rounded-2xl bg-brand-600 text-white font-bold flex items-center justify-center gap-2"
+            >
+              Unduh Produk (CSV)
+            </a>
+          </section>
+
+          <p className="text-xs text-slate-400 text-center px-4">
+            File CSV ini juga cocok dipakai kalau nanti mau dikirim otomatis ke email lewat layanan email terpisah.
+          </p>
         </div>
       )}
     </div>

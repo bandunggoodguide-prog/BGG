@@ -3,26 +3,22 @@
 import { useState } from "react";
 import { ICON_OPTIONS, COLOR_OPTIONS, getProductEmoji, getColorClass } from "@/lib/icons";
 import type { Product } from "@/lib/types";
-import type { Role } from "@/lib/auth";
 
 const UNIT_OPTIONS = ["pcs", "kg", "ons", "liter", "botol", "dus", "pak", "ikat", "bungkus", "sachet"];
 
 export default function ProductFormModal({
   mode,
-  role,
   product,
   categories,
   onClose,
   onSaved,
 }: {
   mode: "create" | "edit";
-  role: Role;
   product?: Product;
   categories: string[];
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const isOwner = role === "OWNER";
   const [name, setName] = useState(product?.name ?? "");
   const [barcode, setBarcode] = useState(product?.barcode ?? "");
   const [category, setCategory] = useState(product?.category ?? (categories[0] || "Lainnya"));
@@ -108,51 +104,6 @@ export default function ProductFormModal({
     }
   }
 
-  // Pegawai: hanya boleh lihat info dasar + tambah stok kedatangan barang.
-  if (!isOwner) {
-    return (
-      <div className="fixed inset-0 bg-black/40 z-[60] flex items-end">
-        <div className="bg-white w-full rounded-t-3xl px-5 pt-5 pb-6 max-h-[85vh] overflow-y-auto">
-          <div className="flex items-center justify-between mb-4">
-            <p className="font-bold text-lg">{product?.name}</p>
-            <button onClick={onClose} className="text-slate-400 text-sm">Tutup</button>
-          </div>
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${getColorClass(color)}`}>
-              {getProductEmoji(icon)}
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">Stok saat ini</p>
-              <p className="text-xl font-bold">
-                {product?.stock} {product?.unit}
-              </p>
-            </div>
-          </div>
-
-          <p className="text-sm font-semibold mb-2">Tambah stok (barang baru datang)</p>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="number"
-              inputMode="decimal"
-              value={restockQty}
-              onChange={(e) => setRestockQty(e.target.value)}
-              placeholder={`Jumlah (${product?.unit})`}
-              className="flex-1 h-12 rounded-xl border border-slate-200 px-3"
-            />
-            <button
-              onClick={submitRestock}
-              disabled={!restockQty || saving}
-              className="btn-tap px-5 rounded-xl bg-brand-600 text-white font-semibold disabled:opacity-40"
-            >
-              Tambah
-            </button>
-          </div>
-          {error && <p className="text-red-600 text-xs">{error}</p>}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="fixed inset-0 bg-black/40 z-[60] flex items-end">
       <div className="bg-white w-full rounded-t-3xl px-5 pt-5 pb-8 max-h-[92vh] overflow-y-auto">
@@ -223,7 +174,7 @@ export default function ProductFormModal({
           <PriceField label="Harga Umum (pembeli biasa)" value={priceRegular} onChange={setPriceRegular} />
           <PriceField label="Harga Grosir (antar warung / B2B)" value={priceB2B} onChange={setPriceB2B} />
           <PriceField label="Harga Donasi (sosial / spesial)" value={priceDonation} onChange={setPriceDonation} />
-          <PriceField label="Harga Modal (untuk hitung untung, tidak terlihat pegawai)" value={costPrice} onChange={setCostPrice} />
+          <PriceField label="Harga Modal (untuk hitung keuntungan)" value={costPrice} onChange={setCostPrice} />
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-3">
@@ -236,6 +187,29 @@ export default function ProductFormModal({
             <input type="number" inputMode="decimal" value={minStock} onChange={(e) => setMinStock(e.target.value)} className="w-full h-12 rounded-xl border border-slate-200 px-3 mt-1" />
           </div>
         </div>
+
+        {mode === "edit" && (
+          <div className="mb-3">
+            <label className="text-xs font-semibold text-slate-500">Tambah stok cepat (barang baru datang)</label>
+            <div className="flex gap-2 mt-1">
+              <input
+                type="number"
+                inputMode="decimal"
+                value={restockQty}
+                onChange={(e) => setRestockQty(e.target.value)}
+                placeholder={`Jumlah (${unit})`}
+                className="flex-1 h-12 rounded-xl border border-slate-200 px-3"
+              />
+              <button
+                onClick={submitRestock}
+                disabled={!restockQty || saving}
+                className="btn-tap px-5 rounded-xl bg-brand-50 text-brand-700 font-semibold disabled:opacity-40"
+              >
+                Tambah
+              </button>
+            </div>
+          </div>
+        )}
 
         <label className="flex items-center gap-2 mb-5">
           <input type="checkbox" checked={quickAccess} onChange={(e) => setQuickAccess(e.target.checked)} className="w-5 h-5" />

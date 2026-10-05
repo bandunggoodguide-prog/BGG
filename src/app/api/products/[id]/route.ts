@@ -1,30 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ApiAuthError, requireApiSession } from "@/lib/auth";
-import { sanitizeProductForRole } from "@/lib/serialize";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_request: NextRequest, { params }: Params) {
-  try {
-    const session = await requireApiSession();
-    const { id } = await params;
-    const product = await prisma.product.findUnique({ where: { id } });
-    if (!product) {
-      return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
-    }
-    return NextResponse.json({ product: sanitizeProductForRole(product, session.role) });
-  } catch (err) {
-    if (err instanceof ApiAuthError) {
-      return NextResponse.json({ error: err.message }, { status: err.status });
-    }
-    throw err;
+  const { id } = await params;
+  const product = await prisma.product.findUnique({ where: { id } });
+  if (!product) {
+    return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
   }
+  return NextResponse.json({ product });
 }
 
 export async function PUT(request: NextRequest, { params }: Params) {
   try {
-    await requireApiSession("OWNER");
     const { id } = await params;
     const body = await request.json();
 
@@ -52,9 +41,6 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     return NextResponse.json({ product });
   } catch (err) {
-    if (err instanceof ApiAuthError) {
-      return NextResponse.json({ error: err.message }, { status: err.status });
-    }
     if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2002") {
       return NextResponse.json({ error: "Barcode sudah dipakai produk lain" }, { status: 409 });
     }
@@ -63,15 +49,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 }
 
 export async function DELETE(_request: NextRequest, { params }: Params) {
-  try {
-    await requireApiSession("OWNER");
-    const { id } = await params;
-    await prisma.product.update({ where: { id }, data: { active: false } });
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    if (err instanceof ApiAuthError) {
-      return NextResponse.json({ error: err.message }, { status: err.status });
-    }
-    throw err;
-  }
+  const { id } = await params;
+  await prisma.product.update({ where: { id }, data: { active: false } });
+  return NextResponse.json({ ok: true });
 }

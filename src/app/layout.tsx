@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Warung Kita - Kasir",
-  description: "Aplikasi kasir & stok warung grosir",
+  title: "Toko Arief - Kasir",
+  description: "Aplikasi kasir & stok Toko Arief",
   manifest: "/manifest.json",
   icons: {
     icon: "/icons/icon-192.png",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Warung Kita",
+    title: "Toko Arief",
   },
 };
 

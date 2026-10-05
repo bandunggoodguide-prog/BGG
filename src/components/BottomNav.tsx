@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactElement } from "react";
-import type { Role } from "@/lib/auth";
 
 const ICONS: Record<string, ReactElement> = {
   kasir: (
@@ -32,31 +31,24 @@ const ICONS: Record<string, ReactElement> = {
       <path d="M7 15l4-5 3 3 5-7" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
-  akun: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
 };
 
-export default function BottomNav({ role }: { role: Role }) {
-  const pathname = usePathname();
+const ITEMS = [
+  { href: "/kasir", label: "Kasir", icon: "kasir" },
+  { href: "/produk", label: "Produk", icon: "produk" },
+  { href: "/riwayat", label: "Riwayat", icon: "riwayat" },
+  { href: "/laporan", label: "Laporan", icon: "laporan" },
+];
 
-  const items = [
-    { href: "/kasir", label: "Kasir", icon: "kasir" },
-    { href: "/produk", label: "Produk", icon: "produk" },
-    { href: "/riwayat", label: "Riwayat", icon: "riwayat" },
-    ...(role === "OWNER" ? [{ href: "/laporan", label: "Laporan", icon: "laporan" }] : []),
-    { href: "/akun", label: "Akun", icon: "akun" },
-  ];
+export default function BottomNav() {
+  const pathname = usePathname();
 
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around z-40"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
-      {items.map((item) => {
+      {ITEMS.map((item) => {
         const active = pathname === item.href || pathname.startsWith(item.href + "/");
         return (
           <Link

@@ -1,16 +1,4 @@
 -- CreateTable
-CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "pinHash" TEXT NOT NULL,
-    "role" TEXT NOT NULL,
-    "active" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -37,7 +25,6 @@ CREATE TABLE "Product" (
 CREATE TABLE "Transaction" (
     "id" TEXT NOT NULL,
     "code" TEXT NOT NULL,
-    "cashierId" TEXT NOT NULL,
     "customerType" TEXT NOT NULL,
     "customerNote" TEXT,
     "totalAmount" INTEGER NOT NULL,
@@ -70,7 +57,6 @@ CREATE TABLE "StockMovement" (
     "type" TEXT NOT NULL,
     "qty" DOUBLE PRECISION NOT NULL,
     "note" TEXT,
-    "userId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "StockMovement_pkey" PRIMARY KEY ("id")
@@ -107,9 +93,6 @@ CREATE INDEX "StockMovement_productId_idx" ON "StockMovement"("productId");
 CREATE INDEX "StockMovement_createdAt_idx" ON "StockMovement"("createdAt");
 
 -- AddForeignKey
-ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_cashierId_fkey" FOREIGN KEY ("cashierId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "TransactionItem" ADD CONSTRAINT "TransactionItem_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "Transaction"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -117,6 +100,3 @@ ALTER TABLE "TransactionItem" ADD CONSTRAINT "TransactionItem_productId_fkey" FO
 
 -- AddForeignKey
 ALTER TABLE "StockMovement" ADD CONSTRAINT "StockMovement_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "StockMovement" ADD CONSTRAINT "StockMovement_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

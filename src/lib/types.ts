@@ -6,7 +6,7 @@ export type Product = {
   unit: string;
   icon: string;
   color: string;
-  costPrice: number | null;
+  costPrice: number;
   priceRegular: number;
   priceB2B: number;
   priceDonation: number;
