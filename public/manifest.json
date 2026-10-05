@@ -1,0 +1,16 @@
+{
+  "name": "Warung Kita - Kasir & Stok",
+  "short_name": "Warung Kita",
+  "description": "Aplikasi kasir, harga 3 tingkat, dan rekap stok untuk warung grosir",
+  "start_url": "/kasir",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#16a34a",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
