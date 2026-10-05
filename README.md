@@ -10,6 +10,7 @@ Aplikasi kasir sederhana yang bisa dibuka lewat browser HP (seperti buka Instagr
 - **Pembayaran & kembalian otomatis dihitung**, hasilnya tersimpan sebagai "struk digital" di sistem (tidak perlu printer), dan bisa dibagikan ke pembeli lewat WhatsApp kalau mau.
 - **Rekap stok otomatis**: produk apa yang paling laku, mana yang "stuck" (modal mengendap, tidak laku), dan daftar prioritas belanja/restock supaya tidak kehabisan barang penting.
 - **Semua data bisa diunduh sendiri** langsung dari aplikasi (menu Laporan → Unduh Data) dalam format CSV (bisa dibuka di Excel/Google Sheets) — baik riwayat transaksi maupun daftar produk & stok.
+- **Impor ribuan produk sekaligus** dari file CSV/Excel (menu Produk → Impor dari CSV/Excel) — tidak perlu input satu-satu lewat HP. Lihat bagian **Impor Produk Massal** di bawah.
 - Bisa **"ditambahkan ke Layar Utama HP"** supaya tampil seperti aplikasi asli dengan ikon sendiri (PWA).
 
 > Tidak ada sistem login/peran (pemilik vs pegawai) — aplikasi ini dibuat untuk dipakai sendiri. Lihat bagian **Keamanan** di bawah untuk hal penting yang perlu diketahui soal ini.
@@ -86,6 +87,19 @@ Semua transaksi tercatat otomatis seperti struk digital, bisa difilter per hari/
 - **Produk Terlaris** — barang yang paling cepat habis.
 - **Prioritas Restock** — daftar barang yang stoknya akan habis dalam beberapa hari (berdasarkan kecepatan jual), dan daftar barang yang **stuck** (modal mengendap karena tidak laku-laku).
 - **Unduh Data** — unduh seluruh riwayat transaksi dan daftar produk sebagai file CSV, langsung dari HP, kapan saja.
+
+### Impor Produk Massal (buat yang punya ribuan barang)
+
+Daripada input satu-satu lewat HP, siapkan daftar barang di Excel/Google Sheets lalu unggah sekali lewat menu **Produk → Impor dari CSV/Excel**.
+
+Caranya:
+1. Di menu Produk, tekan **Unduh format** — ini mengunduh file CSV dengan kolom yang benar (kalau produk masih kosong, filenya berisi header saja, tetap bisa dipakai sebagai contoh format).
+2. Buka file itu di Excel/Google Sheets, isi daftar barang. Yang **wajib** diisi cuma dua kolom: **Nama Produk** dan **Harga Umum**. Kolom lain (Barcode, Kategori, Satuan, Stok, Harga Modal, Harga Grosir, Harga Donasi) boleh dikosongkan — nanti otomatis diisi nilai wajar (misalnya Harga Grosir & Harga Donasi ikut sama dengan Harga Umum kalau tidak diisi, stok dianggap 0), tinggal diperbaiki belakangan lewat aplikasi kalau perlu beda harga per tingkat.
+3. Simpan sebagai file **.csv** (di Excel: *Save As → CSV*; di Google Sheets: *File → Download → Comma-separated values*).
+4. Di aplikasi, tekan **Impor dari CSV/Excel**, pilih file tadi. Ribuan baris selesai diproses dalam hitungan detik.
+5. Muncul ringkasan: berapa produk baru, berapa yang diperbarui, dan baris mana saja yang gagal (misalnya karena harga kosong/salah ketik) — tinggal diperbaiki di spreadsheet dan diunggah ulang, baris yang sudah benar tidak akan dobel.
+
+Aturan pencocokan: kalau **Barcode** di baris itu cocok dengan produk yang sudah ada → produk itu **diperbarui**. Kalau tidak ada barcode tapi **Nama Produk**-nya persis sama dengan yang sudah ada → juga **diperbarui**. Selain itu → jadi **produk baru**. Jadi file yang sama bisa diunggah berkali-kali (misalnya untuk update harga massal) tanpa takut data dobel.
 
 ---
 
