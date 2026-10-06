@@ -4,7 +4,7 @@ Aplikasi kasir sederhana yang bisa dibuka lewat browser HP (seperti buka Instagr
 
 ## Fitur Utama
 
-- **Cek Harga jadi halaman pembuka** — buka link-nya, langsung bisa scan barcode atau cari nama produk, harga muncul besar di layar. Cocok buat pembeli yang cuma mau tahu harga, atau titik cek harga mandiri.
+- **Cek Harga jadi halaman pembuka, kamera langsung nyala** — buka link-nya, kamera otomatis aktif siap scan (tidak perlu tap apa-apa dulu), atau cari nama produk lewat kotak pencarian. Harga muncul besar di layar. Cocok buat pembeli yang cuma mau tahu harga, atau titik cek harga mandiri.
 - **3 tingkat harga otomatis**: Umum (pembeli biasa), Grosir/B2B (antar warung), Donasi (harga spesial sosial). Tinggal pilih jenis pembeli di Kasir, semua harga di keranjang otomatis menyesuaikan.
 - **Scan barcode pakai kamera HP** untuk produk kemasan pabrik (mie instan, sabun, minuman, dll), ditambah **grid tombol gambar** untuk barang curah/eceran tanpa barcode (beras, gula, cabai, bawang, dll). Mendukung juga alat scanner barcode USB/Bluetooth kalau nanti mau pakai.
 - **Keranjang & total otomatis** — tidak perlu hitung manual pakai kalkulator. Tinggal tap produk, total langsung muncul.
@@ -82,7 +82,7 @@ Butuh waktu sekitar 15-20 menit, dan **gratis** (untuk skala 1 toko, jauh di baw
 Setelah itu akan muncul ikon "Toko Arief" di layar HP seperti aplikasi biasa — buka langsung tampil Cek Harga.
 
 ### Cek harga tanpa transaksi (menu Cek Harga — halaman pembuka)
-Buat yang cuma mau tahu harga suatu barang (misalnya pembeli nanya duluan sebelum beli, atau titik cek harga mandiri): scan barcode-nya atau ketik nama produknya, harga langsung tampil besar (3 tingkat sekaligus) tanpa masuk keranjang belanja. Kalau ternyata jadi dibeli, tinggal tekan **Tambah ke Kasir** dan barangnya otomatis pindah ke keranjang kasir.
+Buat yang cuma mau tahu harga suatu barang (misalnya pembeli nanya duluan sebelum beli, atau titik cek harga mandiri): begitu halaman ini dibuka, kamera sudah langsung siap scan — tinggal arahkan ke barcode, tidak perlu tap apa pun dulu. Bisa juga ketik nama produknya di kotak pencarian kalau barcode-nya tidak mau kebaca. Harga langsung tampil besar (3 tingkat sekaligus) tanpa masuk keranjang belanja. Kalau ternyata jadi dibeli, tinggal tekan **Tambah ke Kasir** dan barangnya otomatis pindah ke keranjang kasir.
 
 ### Menjual barang (menu Kasir)
 1. Pilih jenis pembeli dulu: **Umum / Grosir / Donasi**.
@@ -126,10 +126,14 @@ Aturan pencocokan: kalau **Barcode** di baris itu cocok dengan produk yang sudah
 
 ## 3. Catatan Tentang Scan Barcode
 
-- Untuk barang kemasan pabrik (ada barcode di bungkusnya), tekan tombol scan, arahkan kamera HP ke barcode — otomatis masuk keranjang/tampil harganya.
+- Di **Cek Harga**, kamera langsung menyala begitu halaman dibuka — tidak perlu tekan tombol apa pun, tinggal arahkan ke barcode produk. Di **Kasir**, tekan dulu tombol kotak hijau untuk membuka kamera (supaya tidak mengganggu saat sedang memilih barang lewat grid).
 - Untuk barang curah/eceran tanpa barcode (beras, gula, cabai, bawang, dsb), cukup **tap gambar produknya** di daftar — tidak perlu scan.
 - Fitur scan kamera butuh koneksi HTTPS (alamat Vercel sudah otomatis HTTPS, jadi aman dipakai) dan izin kamera — browser akan tanya izin sekali di awal, pilih "Izinkan".
-- Kalau nanti mau pakai alat scanner barcode fisik (USB/Bluetooth, harga murah di marketplace), tinggal tap kotak pencarian lalu scan — alat tersebut otomatis mengisi kotak pencarian seperti mengetik, dan barang langsung masuk keranjang.
+- **Barcode kecil (rokok, dll) susah kebaca?** Di layar kamera ada dua bantuan (muncul otomatis kalau HP-nya mendukung):
+  - **Geser zoom** (ikon kaca pembesar) untuk memperbesar tampilan sampai barcode kecil terlihat jelas, tanpa perlu mendekatkan HP sampai gambar blur.
+  - **Tombol senter** (ikon lampu) untuk pencahayaan tambahan kalau tempatnya agak gelap atau kemasannya mengilap.
+  - Kalau kedua tombol ini tidak muncul, berarti HP tersebut memang tidak mendukung fitur zoom/senter lewat browser — tinggal pakai jarak & sudut yang pas, atau ketik manual di kotak pencarian.
+- Kalau nanti mau pakai alat scanner barcode fisik (USB/Bluetooth, harga murah di marketplace — biasanya lebih jago baca barcode kecil dibanding kamera HP), tinggal tap kotak pencarian lalu scan — alat tersebut otomatis mengisi kotak pencarian seperti mengetik, dan barang langsung masuk keranjang.
 
 ---
 
@@ -169,6 +173,7 @@ Struktur penting:
 - `src/lib/pricing.ts` — logika pemilihan harga sesuai tingkat pembeli
 - `src/lib/csv.ts` — util pembuatan & pembacaan CSV untuk fitur unduh/impor data
 - `src/lib/owner.ts` — gate PIN pemilik (cookie, verifikasi, `withOwnerGuard` untuk route API)
+- `src/lib/useBarcodeScanner.ts` — hook kamera html5-qrcode bersama (dipakai Cek Harga & Kasir), termasuk zoom/senter via `RangeCameraCapability`/`BooleanCameraCapability`
 - `src/proxy.ts` — middleware yang mengarahkan `/riwayat` & `/laporan` ke `/owner-login` kalau belum terbuka
 - `src/app/api/**` — semua endpoint API; yang terkait Riwayat/Laporan/Export-transaksi dibungkus `withOwnerGuard`, sisanya terbuka
 - `src/components/kasir/KasirClient.tsx` — layar kasir (inti aplikasi)

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import ScannerModal from "@/components/kasir/ScannerModal";
+import InlineScanner from "./InlineScanner";
 import { getProductEmoji, getColorClass } from "@/lib/icons";
 import { formatRupiah, formatQty } from "@/lib/format";
 import type { Product } from "@/lib/types";
@@ -12,7 +12,6 @@ export default function CekHargaClient() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [scannerOpen, setScannerOpen] = useState(false);
   const [result, setResult] = useState<Product | null>(null);
   const [notFound, setNotFound] = useState<string | null>(null);
 
@@ -22,6 +21,12 @@ export default function CekHargaClient() {
       .then((data) => setProducts(data.products ?? []))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!notFound) return;
+    const t = setTimeout(() => setNotFound(null), 2500);
+    return () => clearTimeout(t);
+  }, [notFound]);
 
   const searchResults = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -33,7 +38,6 @@ export default function CekHargaClient() {
     setResult(p);
     setNotFound(null);
     setSearch("");
-    setScannerOpen(false);
   }
 
   function handleBarcodeLookup(code: string) {
@@ -41,8 +45,7 @@ export default function CekHargaClient() {
     if (product) {
       showProduct(product);
     } else {
-      setNotFound(`Barcode "${code}" tidak ditemukan di daftar produk.`);
-      setScannerOpen(false);
+      setNotFound(`Barcode "${code}" tidak ditemukan.`);
     }
   }
 
@@ -97,28 +100,13 @@ export default function CekHargaClient() {
   }
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="text-center mb-5">
-        <p className="font-bold text-lg">Cek Harga</p>
-        <p className="text-sm text-slate-500">Scan barcode atau cari nama produk</p>
-      </div>
-
-      <button
-        onClick={() => {
-          setNotFound(null);
-          setScannerOpen(true);
-        }}
-        className="btn-tap w-full h-32 rounded-3xl bg-brand-600 text-white flex flex-col items-center justify-center gap-2 shadow mb-4"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-10 h-10">
-          <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M7 12h10" strokeLinecap="round" />
-        </svg>
-        <span className="font-bold">Scan Barcode</span>
-      </button>
+    <div className="max-w-md mx-auto relative">
+      <InlineScanner onDetected={handleBarcodeLookup} />
 
       {notFound && (
-        <div className="bg-amber-50 text-amber-700 text-sm rounded-xl px-4 py-3 mb-4 text-center">{notFound}</div>
+        <div className="absolute top-3 left-3 right-3 bg-slate-900/90 text-white text-xs font-medium rounded-full px-4 py-2 text-center z-10">
+          {notFound}
+        </div>
       )}
 
       <input
@@ -130,7 +118,7 @@ export default function CekHargaClient() {
 
       {loading && <p className="text-center text-slate-400 text-sm py-6">Memuat produk...</p>}
 
-      <div className="space-y-2">
+      <div className="space-y-2 pb-4">
         {searchResults.map((p) => (
           <button
             key={p.id}
@@ -150,8 +138,6 @@ export default function CekHargaClient() {
           <p className="text-center text-slate-400 text-sm py-6">Produk tidak ditemukan.</p>
         )}
       </div>
-
-      {scannerOpen && <ScannerModal onDetected={handleBarcodeLookup} onClose={() => setScannerOpen(false)} />}
     </div>
   );
 }
