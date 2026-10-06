@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { classifyRestock } from "@/lib/restock";
+import { withOwnerGuard } from "@/lib/owner";
 
-export async function GET(request: NextRequest) {
+export const GET = withOwnerGuard(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const periodDays = Math.min(Math.max(Number(searchParams.get("days") ?? 30), 1), 180);
   const periodStart = new Date(Date.now() - periodDays * 24 * 60 * 60 * 1000);
@@ -40,4 +41,4 @@ export async function GET(request: NextRequest) {
   const healthy = results.filter((r) => r.status === "AMAN");
 
   return NextResponse.json({ periodDays, urgent, segera, stuck, idle, healthy, all: results });
-}
+});

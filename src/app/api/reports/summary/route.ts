@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withOwnerGuard } from "@/lib/owner";
 
 function parseRange(searchParams: URLSearchParams) {
   const fromParam = searchParams.get("from");
@@ -9,7 +10,7 @@ function parseRange(searchParams: URLSearchParams) {
   return { from, to };
 }
 
-export async function GET(request: NextRequest) {
+export const GET = withOwnerGuard(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const { from, to } = parseRange(searchParams);
 
@@ -79,4 +80,4 @@ export async function GET(request: NextRequest) {
     donationSubsidyEstimate: Math.round(donationSubsidyEstimate),
     bestSellers,
   });
-}
+});

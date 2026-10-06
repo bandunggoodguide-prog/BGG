@@ -2,8 +2,9 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildCsv, csvResponse } from "@/lib/csv";
 import { customerTypeLabel } from "@/lib/format";
+import { withOwnerGuard } from "@/lib/owner";
 
-export async function GET(request: NextRequest) {
+export const GET = withOwnerGuard(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const from = searchParams.get("from");
   const to = searchParams.get("to");
@@ -63,4 +64,4 @@ export async function GET(request: NextRequest) {
   const csv = buildCsv(headers, rows);
   const stamp = new Date().toISOString().slice(0, 10);
   return csvResponse(`transaksi-toko-arief-${stamp}.csv`, csv);
-}
+});

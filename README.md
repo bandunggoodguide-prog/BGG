@@ -1,10 +1,11 @@
 # Toko Arief — Aplikasi Kasir & Stok
 
-Aplikasi kasir sederhana yang bisa dibuka lewat browser HP (seperti buka Instagram/WhatsApp), tanpa perlu install dari Play Store dan **tanpa login/PIN** — buka langsung bisa dipakai.
+Aplikasi kasir sederhana yang bisa dibuka lewat browser HP (seperti buka Instagram/WhatsApp), tanpa perlu install dari Play Store. Begitu dibuka, langsung tampil **Cek Harga** — siapa saja (pembeli maupun kasir) bisa langsung pakai tanpa harus login.
 
 ## Fitur Utama
 
-- **3 tingkat harga otomatis**: Umum (pembeli biasa), Grosir/B2B (antar warung), Donasi (harga spesial sosial). Tinggal pilih jenis pembeli, semua harga di keranjang otomatis menyesuaikan.
+- **Cek Harga jadi halaman pembuka** — buka link-nya, langsung bisa scan barcode atau cari nama produk, harga muncul besar di layar. Cocok buat pembeli yang cuma mau tahu harga, atau titik cek harga mandiri.
+- **3 tingkat harga otomatis**: Umum (pembeli biasa), Grosir/B2B (antar warung), Donasi (harga spesial sosial). Tinggal pilih jenis pembeli di Kasir, semua harga di keranjang otomatis menyesuaikan.
 - **Scan barcode pakai kamera HP** untuk produk kemasan pabrik (mie instan, sabun, minuman, dll), ditambah **grid tombol gambar** untuk barang curah/eceran tanpa barcode (beras, gula, cabai, bawang, dll). Mendukung juga alat scanner barcode USB/Bluetooth kalau nanti mau pakai.
 - **Keranjang & total otomatis** — tidak perlu hitung manual pakai kalkulator. Tinggal tap produk, total langsung muncul.
 - **Pembayaran & kembalian otomatis dihitung**, hasilnya tersimpan sebagai "struk digital" di sistem (tidak perlu printer), dan bisa dibagikan ke pembeli lewat WhatsApp kalau mau.
@@ -13,7 +14,17 @@ Aplikasi kasir sederhana yang bisa dibuka lewat browser HP (seperti buka Instagr
 - **Impor ribuan produk sekaligus** dari file CSV/Excel (menu Produk → Impor dari CSV/Excel) — tidak perlu input satu-satu lewat HP. Lihat bagian **Impor Produk Massal** di bawah.
 - Bisa **"ditambahkan ke Layar Utama HP"** supaya tampil seperti aplikasi asli dengan ikon sendiri (PWA).
 
-> Tidak ada sistem login/peran (pemilik vs pegawai) — aplikasi ini dibuat untuk dipakai sendiri. Lihat bagian **Keamanan** di bawah untuk hal penting yang perlu diketahui soal ini.
+### Struktur menu
+
+Di bagian bawah layar cuma ada **3 ikon**, terbuka untuk siapa saja yang membuka link-nya:
+
+| Ikon | Fungsi |
+|---|---|
+| **Cek Harga** | Scan/cari produk, lihat harga — tanpa masuk keranjang. Ini halaman pembuka. |
+| **Produk** | Lihat & kelola daftar barang, harga, dan stok. |
+| **Kasir** | Proses transaksi jual-beli — ada di sini juga dua tautan ke **Riwayat** dan **Laporan**, tapi keduanya **dikunci PIN khusus pemilik**. |
+
+**Riwayat** (daftar transaksi) dan **Laporan** (omzet, keuntungan, rekap stok) sengaja tidak ditaruh di menu bawah karena isinya data keuangan toko — begitu disentuh dari Kasir, akan diminta **PIN Pemilik** dulu. Setelah PIN benar sekali, HP itu tidak akan ditanya lagi sampai ditekan tombol **Kunci** di halaman Laporan.
 
 ---
 
@@ -41,8 +52,10 @@ Butuh waktu sekitar 15-20 menit, dan **gratis** (untuk skala 1 toko, jauh di baw
 3. **Deploy ke Vercel**
    - Masuk ke [vercel.com](https://vercel.com), klik **Add New → Project**.
    - Pilih repository GitHub yang tadi diunggah.
-   - Sebelum klik Deploy, buka bagian **Environment Variables**, lalu tambahkan satu variabel:
+   - Sebelum klik Deploy, buka bagian **Environment Variables**, lalu tambahkan tiga variabel:
      - `DATABASE_URL` → tempel connection string dari Neon tadi
+     - `OWNER_PIN` → angka 4-6 digit bebas, ini PIN rahasia untuk membuka Riwayat & Laporan (misalnya `193847`, **jangan dibuat mudah ditebak seperti 123456**)
+     - `OWNER_SECRET` → teks acak yang panjang (bebas, contoh: `toko-arief-rahasia-2026-jangan-disebar-xyz123`), dipakai server untuk mengamankan sesi "mode pemilik" — ini BUKAN PIN, cukup diisi sekali dan tidak perlu diingat
    - Klik **Deploy**, tunggu beberapa menit sampai selesai.
 
 4. **Siapkan isi database (sekali saja)**
@@ -54,7 +67,7 @@ Butuh waktu sekitar 15-20 menit, dan **gratis** (untuk skala 1 toko, jauh di baw
      ```
    - Perintah `prisma:seed` akan memasukkan beberapa produk contoh, supaya langsung bisa dicoba. Produk contoh ini bisa dihapus/diganti lewat menu **Produk** di aplikasi.
 
-5. **Selesai!** Vercel akan memberi alamat website, misalnya `https://toko-arief.vercel.app`. Alamat inilah yang dibuka dari HP.
+5. **Selesai!** Vercel akan memberi alamat website, misalnya `https://toko-arief.vercel.app`. Alamat inilah yang dibuka dari HP — langsung tampil Cek Harga.
 
 > Kalau butuh bantuan teknis saat deploy, tunjukkan file ini ke siapa pun yang membantu — semua langkah di atas standar dan terdokumentasi resmi di situs Vercel & Neon.
 
@@ -66,7 +79,10 @@ Butuh waktu sekitar 15-20 menit, dan **gratis** (untuk skala 1 toko, jauh di baw
 - **Android (Chrome):** buka alamat website → titik tiga di pojok kanan atas → "Tambahkan ke Layar Utama" / "Install aplikasi".
 - **iPhone (Safari):** buka alamat website → tombol Bagikan (kotak dengan panah ke atas) → "Tambah ke Layar Utama".
 
-Setelah itu akan muncul ikon hijau "Toko Arief" di layar HP seperti aplikasi biasa — buka langsung masuk ke kasir, tidak ada layar login.
+Setelah itu akan muncul ikon "Toko Arief" di layar HP seperti aplikasi biasa — buka langsung tampil Cek Harga.
+
+### Cek harga tanpa transaksi (menu Cek Harga — halaman pembuka)
+Buat yang cuma mau tahu harga suatu barang (misalnya pembeli nanya duluan sebelum beli, atau titik cek harga mandiri): scan barcode-nya atau ketik nama produknya, harga langsung tampil besar (3 tingkat sekaligus) tanpa masuk keranjang belanja. Kalau ternyata jadi dibeli, tinggal tekan **Tambah ke Kasir** dan barangnya otomatis pindah ke keranjang kasir.
 
 ### Menjual barang (menu Kasir)
 1. Pilih jenis pembeli dulu: **Umum / Grosir / Donasi**.
@@ -75,21 +91,23 @@ Setelah itu akan muncul ikon hijau "Toko Arief" di layar HP seperti aplikasi bia
 4. Tekan **Bayar**, masukkan uang yang diterima (atau tekan "Uang Pas"), kembalian otomatis muncul.
 5. Tekan **Selesai & Simpan** — transaksi tersimpan, bisa dibagikan ke WhatsApp pembeli kalau mau.
 
-### Cek harga tanpa transaksi (menu Cek Harga)
-Buat yang cuma mau tahu harga suatu barang (misalnya pembeli nanya duluan sebelum beli, atau titik cek harga mandiri): buka menu **Cek Harga**, scan barcode-nya atau ketik nama produknya, harga langsung tampil besar (3 tingkat sekaligus) tanpa masuk keranjang belanja. Kalau ternyata jadi dibeli, tinggal tekan **Tambah ke Kasir** dan barangnya otomatis pindah ke keranjang kasir.
+### Melihat Riwayat & Laporan (khusus Pemilik, dari dalam Kasir)
+Di bagian atas halaman Kasir ada dua tombol kecil: **Riwayat** dan **Laporan**. Begitu ditekan:
+1. Kalau belum pernah buka sebelumnya di HP itu, akan diminta **PIN Pemilik** (yang diisi di `OWNER_PIN` saat deploy).
+2. Setelah PIN benar, langsung masuk, dan HP itu tidak akan ditanya PIN lagi untuk kunjungan berikutnya.
+3. Di halaman **Laporan**, ada tombol **Kunci** untuk mengunci lagi mode pemilik di HP tersebut (penting dipakai kalau HP kasir dipakai bergantian/dipegang orang lain).
 
-### Mengelola produk & stok (menu Produk)
-Tambah produk baru, ubah harga (3 tingkat + harga modal), tambah stok cepat saat barang baru datang, atau nonaktifkan produk yang sudah tidak dijual.
+Isi **Riwayat**: semua transaksi tercatat otomatis seperti struk digital, bisa difilter per hari/7 hari/30 hari, lengkap dengan keuntungan per transaksi.
 
-### Melihat riwayat transaksi (menu Riwayat)
-Semua transaksi tercatat otomatis seperti struk digital, bisa difilter per hari/7 hari/30 hari, lengkap dengan keuntungan per transaksi.
-
-### Melihat laporan & rekomendasi restock (menu Laporan)
+Isi **Laporan**:
 - Omzet, keuntungan, jumlah transaksi, dan nilai subsidi yang sudah diberikan lewat harga Donasi.
 - Penjualan per jenis pembeli (Umum/Grosir/Donasi).
 - **Produk Terlaris** — barang yang paling cepat habis.
 - **Prioritas Restock** — daftar barang yang stoknya akan habis dalam beberapa hari (berdasarkan kecepatan jual), dan daftar barang yang **stuck** (modal mengendap karena tidak laku-laku).
 - **Unduh Data** — unduh seluruh riwayat transaksi dan daftar produk sebagai file CSV, langsung dari HP, kapan saja.
+
+### Mengelola produk & stok (menu Produk)
+Tambah produk baru, ubah harga (3 tingkat + harga modal), tambah stok cepat saat barang baru datang, atau nonaktifkan produk yang sudah tidak dijual. **Menu ini terbuka untuk siapa saja yang membuka link aplikasi** — lihat catatan di bagian Keamanan.
 
 ### Impor Produk Massal (buat yang punya ribuan barang)
 
@@ -108,7 +126,7 @@ Aturan pencocokan: kalau **Barcode** di baris itu cocok dengan produk yang sudah
 
 ## 3. Catatan Tentang Scan Barcode
 
-- Untuk barang kemasan pabrik (ada barcode di bungkusnya), tekan tombol scan, arahkan kamera HP ke barcode — otomatis masuk keranjang.
+- Untuk barang kemasan pabrik (ada barcode di bungkusnya), tekan tombol scan, arahkan kamera HP ke barcode — otomatis masuk keranjang/tampil harganya.
 - Untuk barang curah/eceran tanpa barcode (beras, gula, cabai, bawang, dsb), cukup **tap gambar produknya** di daftar — tidak perlu scan.
 - Fitur scan kamera butuh koneksi HTTPS (alamat Vercel sudah otomatis HTTPS, jadi aman dipakai) dan izin kamera — browser akan tanya izin sekali di awal, pilih "Izinkan".
 - Kalau nanti mau pakai alat scanner barcode fisik (USB/Bluetooth, harga murah di marketplace), tinggal tap kotak pencarian lalu scan — alat tersebut otomatis mengisi kotak pencarian seperti mengetik, dan barang langsung masuk keranjang.
@@ -117,14 +135,11 @@ Aturan pencocokan: kalau **Barcode** di baris itu cocok dengan produk yang sudah
 
 ## 4. Keamanan — Penting Dibaca
 
-Aplikasi ini **sengaja tanpa login/PIN** supaya cepat dipakai. Konsekuensinya: **siapa pun yang tahu alamat websitenya bisa membuka, melihat, dan mengubah semua data** (termasuk harga, stok, dan riwayat transaksi) — karena ini aplikasi online yang bisa diakses dari internet.
-
-Supaya aman:
-- **Jangan sebar alamat website-nya** ke orang lain selain yang memang perlu akses (anggap seperti kunci toko).
-- Simpan alamatnya hanya di HP yang dipakai sendiri (bookmark / ikon di layar utama).
-- Kalau alamatnya pernah ter-share atau khawatir bocor, bisa redeploy ke alamat Vercel yang baru kapan saja.
-
-Kalau suatu saat butuh tambahan proteksi tanpa login per-pengguna, opsi paling simpel adalah mengaktifkan **Vercel Deployment Protection** (fitur bawaan Vercel, perlu paket berbayar) atau menambahkan satu kata sandi tunggal untuk seluruh aplikasi — tinggal bilang saja kalau nanti mau ditambahkan.
+- **Riwayat & Laporan** (data keuangan: omzet, keuntungan, histori transaksi) dikunci **PIN Pemilik** (`OWNER_PIN`). Jangan sebar PIN ini ke sembarang orang — anggap seperti kunci brankas.
+- **Cek Harga, Produk, dan Kasir sengaja terbuka untuk siapa saja** yang membuka link aplikasi, tanpa PIN — sesuai permintaan supaya cepat dipakai tanpa hambatan.
+- Konsekuensinya: menu **Produk** (termasuk tombol tambah/edit/hapus produk, harga, dan **harga modal**) bisa diakses dan diubah siapa pun yang punya link-nya, bukan cuma pemilik. Begitu juga transaksi di Kasir bisa dibuat siapa saja. **Kalau ini terasa terlalu terbuka**, opsi yang gampang ditambahkan nanti: kunci juga tombol tambah/edit produk (dan sembunyikan Harga Modal) di balik PIN Pemilik yang sama, sementara orang tetap bisa lihat-lihat stok & harga jual seperti katalog biasa — tinggal bilang saja kalau mau ditambahkan.
+- **Jangan sebar alamat website-nya** ke orang yang tidak perlu — anggap seperti kunci toko. Simpan alamatnya di HP yang dipakai sendiri (bookmark / ikon di layar utama).
+- `OWNER_SECRET` jangan dibagikan ke siapa pun — ini kunci rahasia supaya sesi "mode pemilik" tidak bisa dipalsukan.
 
 ---
 
@@ -140,18 +155,21 @@ Dijalankan secara lokal untuk pengembangan:
 
 ```bash
 npm install
-cp .env.example .env   # isi DATABASE_URL (PostgreSQL)
+cp .env.example .env   # isi DATABASE_URL, OWNER_PIN, OWNER_SECRET
 npx prisma migrate dev
 npm run prisma:seed
 npm run dev
 ```
 
-**Stack**: Next.js 16 (App Router) + TypeScript + Tailwind CSS + Prisma + PostgreSQL. Scan barcode pakai `html5-qrcode`. Tidak ada autentikasi — semua endpoint API terbuka (lihat bagian Keamanan di atas).
+**Stack**: Next.js 16 (App Router) + TypeScript + Tailwind CSS + Prisma + PostgreSQL. Scan barcode pakai `html5-qrcode`. Sesi "mode pemilik" pakai JWT di cookie httpOnly (`jose`), ditandatangani dengan `OWNER_SECRET` dan hanya terbit kalau `OWNER_PIN` cocok — satu PIN bersama untuk pemilik, bukan sistem akun per-pengguna.
 
 Struktur penting:
 - `prisma/schema.prisma` — model database (Product, Transaction, TransactionItem, StockMovement)
 - `src/lib/restock.ts` — logika perhitungan prioritas restock & produk stuck
 - `src/lib/pricing.ts` — logika pemilihan harga sesuai tingkat pembeli
-- `src/lib/csv.ts` — util pembuatan file CSV untuk fitur unduh data
-- `src/app/api/**` — semua endpoint API (tanpa autentikasi)
+- `src/lib/csv.ts` — util pembuatan & pembacaan CSV untuk fitur unduh/impor data
+- `src/lib/owner.ts` — gate PIN pemilik (cookie, verifikasi, `withOwnerGuard` untuk route API)
+- `src/proxy.ts` — middleware yang mengarahkan `/riwayat` & `/laporan` ke `/owner-login` kalau belum terbuka
+- `src/app/api/**` — semua endpoint API; yang terkait Riwayat/Laporan/Export-transaksi dibungkus `withOwnerGuard`, sisanya terbuka
 - `src/components/kasir/KasirClient.tsx` — layar kasir (inti aplikasi)
+- `src/components/cekharga/CekHargaClient.tsx` — layar Cek Harga (halaman pembuka)

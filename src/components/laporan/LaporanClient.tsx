@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { formatRupiah, formatQty } from "@/lib/format";
 import { RESTOCK_STATUS_LABEL, type RestockResult, type RestockStatus } from "@/lib/restock";
 
@@ -39,6 +40,7 @@ const STATUS_BADGE: Record<RestockStatus, string> = {
 };
 
 export default function LaporanClient() {
+  const [locking, setLocking] = useState(false);
   const [range, setRange] = useState<(typeof RANGE_PRESETS)[number]["key"]>("30");
   const [summary, setSummary] = useState<Summary | null>(null);
   const [restock, setRestock] = useState<RestockReport | null>(null);
@@ -66,8 +68,27 @@ export default function LaporanClient() {
 
   const maxBestSeller = summary?.bestSellers?.[0]?.qty ?? 1;
 
+  async function lockOwnerMode() {
+    setLocking(true);
+    await fetch("/api/owner/logout", { method: "POST" });
+    window.location.href = "/kasir";
+  }
+
   return (
     <div className="pb-6">
+      <div className="flex items-center justify-between mb-3">
+        <Link href="/kasir" className="text-slate-500 text-sm">
+          ← Kembali ke Kasir
+        </Link>
+        <button onClick={lockOwnerMode} disabled={locking} className="text-xs font-semibold text-red-500 flex items-center gap-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5">
+            <rect x="4" y="11" width="16" height="9" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v1" strokeLinecap="round" />
+          </svg>
+          {locking ? "Mengunci..." : "Kunci"}
+        </button>
+      </div>
+
       <div className="flex gap-2 mb-3">
         {RANGE_PRESETS.map((p) => (
           <button

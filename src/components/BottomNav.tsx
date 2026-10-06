@@ -19,18 +19,6 @@ const ICONS: Record<string, ReactElement> = {
       <path d="M12 13v8" strokeLinecap="round" />
     </svg>
   ),
-  riwayat: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
-      <path d="M12 8v4l3 3" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="12" cy="12" r="9" />
-    </svg>
-  ),
-  laporan: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
-      <path d="M3 3v18h18" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M7 15l4-5 3 3 5-7" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
   cekharga: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
       <circle cx="11" cy="11" r="7" />
@@ -41,11 +29,9 @@ const ICONS: Record<string, ReactElement> = {
 };
 
 const ITEMS = [
-  { href: "/kasir", label: "Kasir", icon: "kasir" },
   { href: "/cek-harga", label: "Cek Harga", icon: "cekharga" },
   { href: "/produk", label: "Produk", icon: "produk" },
-  { href: "/riwayat", label: "Riwayat", icon: "riwayat" },
-  { href: "/laporan", label: "Laporan", icon: "laporan" },
+  { href: "/kasir", label: "Kasir", icon: "kasir" },
 ];
 
 export default function BottomNav() {

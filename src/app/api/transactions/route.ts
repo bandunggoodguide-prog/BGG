@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { priceForCustomerType, type CustomerType } from "@/lib/pricing";
+import { OwnerAuthError, requireOwnerApi } from "@/lib/owner";
 
 async function generateCode(): Promise<string> {
   const now = new Date();
@@ -104,26 +105,34 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const from = searchParams.get("from");
-  const to = searchParams.get("to");
-  const limit = Math.min(Number(searchParams.get("limit") ?? 50), 200);
+  try {
+    await requireOwnerApi();
+    const { searchParams } = new URL(request.url);
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
+    const limit = Math.min(Number(searchParams.get("limit") ?? 50), 200);
 
-  const transactions = await prisma.transaction.findMany({
-    where: {
-      ...(from || to
-        ? {
-            createdAt: {
-              ...(from ? { gte: new Date(from) } : {}),
-              ...(to ? { lte: new Date(to) } : {}),
-            },
-          }
-        : {}),
-    },
-    include: { items: true },
-    orderBy: { createdAt: "desc" },
-    take: limit,
-  });
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        ...(from || to
+          ? {
+              createdAt: {
+                ...(from ? { gte: new Date(from) } : {}),
+                ...(to ? { lte: new Date(to) } : {}),
+              },
+            }
+          : {}),
+      },
+      include: { items: true },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
 
-  return NextResponse.json({ transactions });
+    return NextResponse.json({ transactions });
+  } catch (err) {
+    if (err instanceof OwnerAuthError) {
+      return NextResponse.json({ error: err.message }, { status: err.status });
+    }
+    throw err;
+  }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { formatDateTime, formatRupiah, customerTypeLabel } from "@/lib/format";
 import ReceiptView, { type ReceiptData } from "@/components/ReceiptView";
 
@@ -54,6 +55,10 @@ export default function RiwayatClient() {
 
   return (
     <div className="pb-6">
+      <Link href="/kasir" className="text-slate-500 text-sm mb-3 inline-block">
+        ← Kembali ke Kasir
+      </Link>
+
       <div className="flex gap-2 mb-3">
         {PRESETS.map((p) => (
           <button

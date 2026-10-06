@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import CustomerTypeSelector from "./CustomerTypeSelector";
 import ProductGrid from "./ProductGrid";
 import CartSheet from "./CartSheet";
@@ -209,6 +210,29 @@ export default function KasirClient() {
 
   return (
     <div className="pb-24">
+      <div className="flex justify-end gap-2 mb-3">
+        <Link
+          href="/riwayat"
+          className="btn-tap flex items-center gap-1.5 px-3 h-9 rounded-full bg-white border border-slate-200 text-xs font-semibold text-slate-500"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+            <path d="M12 8v4l3 3" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="12" cy="12" r="9" />
+          </svg>
+          Riwayat
+        </Link>
+        <Link
+          href="/laporan"
+          className="btn-tap flex items-center gap-1.5 px-3 h-9 rounded-full bg-white border border-slate-200 text-xs font-semibold text-slate-500"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+            <path d="M3 3v18h18" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M7 15l4-5 3 3 5-7" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Laporan
+        </Link>
+      </div>
+
       <div className="mb-3">
         <CustomerTypeSelector value={customerType} onChange={setCustomerType} />
       </div>

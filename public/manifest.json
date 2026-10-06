@@ -2,7 +2,7 @@
   "name": "Toko Arief - Kasir & Stok",
   "short_name": "Toko Arief",
   "description": "Aplikasi kasir, harga 3 tingkat, dan rekap stok untuk Toko Arief",
-  "start_url": "/kasir",
+  "start_url": "/cek-harga",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#16a34a",
