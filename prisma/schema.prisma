@@ -16,9 +16,9 @@ model Product {
   icon          String   @default("package") // emoji key, see lib/icons
   color         String   @default("slate")
   costPrice     Int      @default(0) // harga modal
-  priceRegular  Int // harga umum / eceran
-  priceB2B      Int // harga grosir antar warung
-  priceDonation Int // harga donasi / sosial
+  priceRegular  Int // harga satuan / eceran
+  priceB2B      Int // harga ke warung (antar warung)
+  priceDus      Int? // harga per dus/karton (opsional, buat referensi beli stok)
   stock         Float    @default(0)
   minStock      Float    @default(5)
   quickAccess   Boolean  @default(true) // tampil di grid cepat kasir

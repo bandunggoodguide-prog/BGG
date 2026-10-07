@@ -5,7 +5,7 @@ Aplikasi kasir sederhana yang bisa dibuka lewat browser HP (seperti buka Instagr
 ## Fitur Utama
 
 - **Cek Harga jadi halaman pembuka, kamera langsung nyala** — buka link-nya, kamera otomatis aktif siap scan (tidak perlu tap apa-apa dulu), atau cari nama produk lewat kotak pencarian. Harga muncul besar di layar. Cocok buat pembeli yang cuma mau tahu harga, atau titik cek harga mandiri.
-- **3 tingkat harga otomatis**: Umum (pembeli biasa), Grosir/B2B (antar warung), Donasi (harga spesial sosial). Tinggal pilih jenis pembeli di Kasir, semua harga di keranjang otomatis menyesuaikan.
+- **Tingkat harga otomatis**: Satuan (pembeli biasa), Warung/B2B (antar warung). Tinggal pilih jenis pembeli di Kasir, semua harga di keranjang otomatis menyesuaikan. Tiap produk juga bisa diisi **Harga Dus/Karton** sebagai referensi (tidak dijual langsung lewat Kasir, cuma tampil di Cek Harga & Produk) — misalnya Kapal Api per renteng 18rb, ke warung 17rb, per dus 200rb.
 - **Scan barcode pakai kamera HP** untuk produk kemasan pabrik (mie instan, sabun, minuman, dll), ditambah **grid tombol gambar** untuk barang curah/eceran tanpa barcode (beras, gula, cabai, bawang, dll). Mendukung juga alat scanner barcode USB/Bluetooth kalau nanti mau pakai.
 - **Keranjang & total otomatis** — tidak perlu hitung manual pakai kalkulator. Tinggal tap produk, total langsung muncul.
 - **Pembayaran & kembalian otomatis dihitung**, hasilnya tersimpan sebagai "struk digital" di sistem (tidak perlu printer), dan bisa dibagikan ke pembeli lewat WhatsApp kalau mau.
@@ -82,10 +82,10 @@ Butuh waktu sekitar 15-20 menit, dan **gratis** (untuk skala 1 toko, jauh di baw
 Setelah itu akan muncul ikon "Toko Arief" di layar HP seperti aplikasi biasa — buka langsung tampil Cek Harga.
 
 ### Cek harga tanpa transaksi (menu Cek Harga — halaman pembuka)
-Buat yang cuma mau tahu harga suatu barang (misalnya pembeli nanya duluan sebelum beli, atau titik cek harga mandiri): begitu halaman ini dibuka, kamera sudah langsung siap scan — tinggal arahkan ke barcode, tidak perlu tap apa pun dulu. Bisa juga ketik nama produknya di kotak pencarian kalau barcode-nya tidak mau kebaca. Harga langsung tampil besar (3 tingkat sekaligus) tanpa masuk keranjang belanja. Kalau ternyata jadi dibeli, tinggal tekan **Tambah ke Kasir** dan barangnya otomatis pindah ke keranjang kasir.
+Buat yang cuma mau tahu harga suatu barang (misalnya pembeli nanya duluan sebelum beli, atau titik cek harga mandiri): begitu halaman ini dibuka, kamera sudah langsung siap scan — tinggal arahkan ke barcode, tidak perlu tap apa pun dulu. Bisa juga ketik nama produknya di kotak pencarian kalau barcode-nya tidak mau kebaca. Harga langsung tampil besar (Satuan, Warung, dan Dus/Karton kalau diisi) tanpa masuk keranjang belanja. Kalau ternyata jadi dibeli, tinggal tekan **Tambah ke Kasir** dan barangnya otomatis pindah ke keranjang kasir.
 
 ### Menjual barang (menu Kasir)
-1. Pilih jenis pembeli dulu: **Umum / Grosir / Donasi**.
+1. Pilih jenis pembeli dulu: **Satuan / Warung**.
 2. Cari produk dengan mengetik nama, atau tekan tombol hijau kotak untuk **scan barcode** pakai kamera, atau langsung **tap gambar produk** di daftar.
 3. Produk masuk ke keranjang, total otomatis terhitung di bawah.
 4. Tekan **Bayar**, masukkan uang yang diterima (atau tekan "Uang Pas"), kembalian otomatis muncul.
@@ -100,14 +100,14 @@ Di bagian atas halaman Kasir ada dua tombol kecil: **Riwayat** dan **Laporan**. 
 Isi **Riwayat**: semua transaksi tercatat otomatis seperti struk digital, bisa difilter per hari/7 hari/30 hari, lengkap dengan keuntungan per transaksi.
 
 Isi **Laporan**:
-- Omzet, keuntungan, jumlah transaksi, dan nilai subsidi yang sudah diberikan lewat harga Donasi.
-- Penjualan per jenis pembeli (Umum/Grosir/Donasi).
+- Omzet, keuntungan, dan jumlah transaksi.
+- Penjualan per jenis pembeli (Satuan/Warung).
 - **Produk Terlaris** — barang yang paling cepat habis.
 - **Prioritas Restock** — daftar barang yang stoknya akan habis dalam beberapa hari (berdasarkan kecepatan jual), dan daftar barang yang **stuck** (modal mengendap karena tidak laku-laku).
 - **Unduh Data** — unduh seluruh riwayat transaksi dan daftar produk sebagai file CSV, langsung dari HP, kapan saja.
 
 ### Mengelola produk & stok (menu Produk)
-Tambah produk baru, ubah harga (3 tingkat + harga modal), tambah stok cepat saat barang baru datang, atau nonaktifkan produk yang sudah tidak dijual. **Menu ini terbuka untuk siapa saja yang membuka link aplikasi** — lihat catatan di bagian Keamanan.
+Tambah produk baru, ubah harga (Satuan/Warung/Dus + harga modal), tambah stok cepat saat barang baru datang, atau nonaktifkan produk yang sudah tidak dijual. Ada tombol kategori di bawah kotak pencarian supaya bisa langsung lompat ke kategori tertentu tanpa scroll. **Menu ini terbuka untuk siapa saja yang membuka link aplikasi** — lihat catatan di bagian Keamanan.
 
 ### Impor Produk Massal (buat yang punya ribuan barang)
 
@@ -115,7 +115,7 @@ Daripada input satu-satu lewat HP, siapkan daftar barang di Excel/Google Sheets 
 
 Caranya:
 1. Di menu Produk, tekan **Unduh format** — ini mengunduh file CSV dengan kolom yang benar (kalau produk masih kosong, filenya berisi header saja, tetap bisa dipakai sebagai contoh format).
-2. Buka file itu di Excel/Google Sheets, isi daftar barang. Yang **wajib** diisi cuma dua kolom: **Nama Produk** dan **Harga Umum**. Kolom lain (Barcode, Kategori, Satuan, Stok, Harga Modal, Harga Grosir, Harga Donasi) boleh dikosongkan — nanti otomatis diisi nilai wajar (misalnya Harga Grosir & Harga Donasi ikut sama dengan Harga Umum kalau tidak diisi, stok dianggap 0), tinggal diperbaiki belakangan lewat aplikasi kalau perlu beda harga per tingkat.
+2. Buka file itu di Excel/Google Sheets, isi daftar barang. Yang **wajib** diisi cuma dua kolom: **Nama Produk** dan **Harga Satuan**. Kolom lain (Barcode, Kategori, Satuan, Stok, Harga Modal, Harga Warung (B2B), Harga Dus) boleh dikosongkan — nanti otomatis diisi nilai wajar (misalnya Harga Warung ikut sama dengan Harga Satuan kalau tidak diisi, Harga Dus dibiarkan kosong, stok dianggap 0), tinggal diperbaiki belakangan lewat aplikasi kalau perlu beda harga per tingkat.
 3. Simpan sebagai file **.csv** (di Excel: *Save As → CSV*; di Google Sheets: *File → Download → Comma-separated values*).
 4. Di aplikasi, tekan **Impor dari CSV/Excel**, pilih file tadi. Ribuan baris selesai diproses dalam hitungan detik.
 5. Muncul ringkasan: berapa produk baru, berapa yang diperbarui, dan baris mana saja yang gagal (misalnya karena harga kosong/salah ketik) — tinggal diperbaiki di spreadsheet dan diunggah ulang, baris yang sudah benar tidak akan dobel.

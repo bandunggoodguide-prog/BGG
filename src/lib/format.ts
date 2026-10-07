@@ -30,10 +30,11 @@ export function formatDate(date: Date | string): string {
 export function customerTypeLabel(type: string): string {
   switch (type) {
     case "B2B":
-      return "Grosir (B2B)";
+      return "Warung (B2B)";
     case "DONASI":
-      return "Donasi";
+      // Transaksi lama dari masa tingkat harga Donasi masih ada (data historis).
+      return "Donasi (lama)";
     default:
-      return "Umum";
+      return "Satuan";
   }
 }

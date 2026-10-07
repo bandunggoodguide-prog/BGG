@@ -11,7 +11,6 @@ type Summary = {
   profit: number;
   transactionCount: number;
   byType: Record<string, { count: number; totalAmount: number; totalCost: number }>;
-  donationSubsidyEstimate: number;
   bestSellers: { productId: string; name: string; qty: number; revenue: number }[];
 };
 
@@ -28,7 +27,7 @@ const RANGE_PRESETS = [
   { key: "90", label: "90 Hari", days: 90 },
 ] as const;
 
-const TYPE_LABEL: Record<string, string> = { UMUM: "Umum", B2B: "Grosir (B2B)", DONASI: "Donasi" };
+const TYPE_LABEL: Record<string, string> = { UMUM: "Satuan", B2B: "Warung (B2B)", DONASI: "Donasi (lama)" };
 const TYPE_COLOR: Record<string, string> = { UMUM: "bg-blue-500", B2B: "bg-green-500", DONASI: "bg-pink-500" };
 
 const STATUS_BADGE: Record<RestockStatus, string> = {
@@ -132,7 +131,6 @@ export default function LaporanClient() {
             <KpiCard label="Omzet" value={formatRupiah(summary.totalAmount)} />
             <KpiCard label="Keuntungan" value={formatRupiah(summary.profit)} highlight />
             <KpiCard label="Jumlah Transaksi" value={String(summary.transactionCount)} />
-            <KpiCard label="Nilai Subsidi Donasi" value={formatRupiah(summary.donationSubsidyEstimate)} />
           </div>
 
           <section className="bg-white rounded-2xl p-4 border border-slate-100">

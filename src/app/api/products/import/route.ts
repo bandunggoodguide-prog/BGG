@@ -14,7 +14,7 @@ type FieldKey =
   | "costPrice"
   | "priceRegular"
   | "priceB2B"
-  | "priceDonation"
+  | "priceDus"
   | "status";
 
 const HEADER_ALIASES: Record<FieldKey, string[]> = {
@@ -25,9 +25,9 @@ const HEADER_ALIASES: Record<FieldKey, string[]> = {
   stock: ["stok", "stock", "jumlah stok"],
   minStock: ["stok minimum", "minimum stok", "min stock", "stok min"],
   costPrice: ["harga modal", "modal", "cost price", "harga beli"],
-  priceRegular: ["harga umum", "harga jual", "harga", "price", "harga eceran"],
-  priceB2B: ["harga grosir (b2b)", "harga grosir", "harga b2b", "harga antar warung"],
-  priceDonation: ["harga donasi", "harga sosial"],
+  priceRegular: ["harga satuan", "harga umum", "harga jual", "harga", "price", "harga eceran"],
+  priceB2B: ["harga warung (b2b)", "harga grosir (b2b)", "harga warung", "harga grosir", "harga b2b", "harga antar warung"],
+  priceDus: ["harga dus", "harga dus/karton", "harga karton", "harga per dus"],
   status: ["status"],
 };
 
@@ -52,7 +52,7 @@ type ParsedRow = {
   costPrice: number;
   priceRegular: number;
   priceB2B: number;
-  priceDonation: number;
+  priceDus: number | null;
   active: boolean;
 };
 
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
       costPrice: parseRupiah(cell(row, "costPrice")) ?? 0,
       priceRegular,
       priceB2B: parseRupiah(cell(row, "priceB2B")) ?? priceRegular,
-      priceDonation: parseRupiah(cell(row, "priceDonation")) ?? priceRegular,
+      priceDus: parseRupiah(cell(row, "priceDus")),
       active: statusRaw ? statusRaw !== "nonaktif" : true,
     };
 
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
       costPrice: row.costPrice,
       priceRegular: row.priceRegular,
       priceB2B: row.priceB2B,
-      priceDonation: row.priceDonation,
+      priceDus: row.priceDus,
       active: row.active,
     };
   }

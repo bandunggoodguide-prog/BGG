@@ -28,7 +28,7 @@ export default function ProductFormModal({
   const [costPrice, setCostPrice] = useState(String(product?.costPrice ?? ""));
   const [priceRegular, setPriceRegular] = useState(String(product?.priceRegular ?? ""));
   const [priceB2B, setPriceB2B] = useState(String(product?.priceB2B ?? ""));
-  const [priceDonation, setPriceDonation] = useState(String(product?.priceDonation ?? ""));
+  const [priceDus, setPriceDus] = useState(product?.priceDus != null ? String(product.priceDus) : "");
   const [stock, setStock] = useState(String(product?.stock ?? "0"));
   const [minStock, setMinStock] = useState(String(product?.minStock ?? "5"));
   const [quickAccess, setQuickAccess] = useState(product?.quickAccess ?? true);
@@ -50,7 +50,7 @@ export default function ProductFormModal({
         costPrice: Number(costPrice || 0),
         priceRegular: Number(priceRegular || 0),
         priceB2B: Number(priceB2B || 0),
-        priceDonation: Number(priceDonation || 0),
+        priceDus: priceDus.trim() ? Number(priceDus) : null,
         stock: Number(stock || 0),
         minStock: Number(minStock || 0),
         quickAccess,
@@ -169,11 +169,11 @@ export default function ProductFormModal({
           ))}
         </div>
 
-        <p className="text-xs font-semibold text-slate-500 mb-1">Harga Jual (3 tingkat)</p>
+        <p className="text-xs font-semibold text-slate-500 mb-1">Harga Jual</p>
         <div className="space-y-2 mb-3">
-          <PriceField label="Harga Umum (pembeli biasa)" value={priceRegular} onChange={setPriceRegular} />
-          <PriceField label="Harga Grosir (antar warung / B2B)" value={priceB2B} onChange={setPriceB2B} />
-          <PriceField label="Harga Donasi (sosial / spesial)" value={priceDonation} onChange={setPriceDonation} />
+          <PriceField label="Harga Satuan (per pcs/renteng/botol, dst)" value={priceRegular} onChange={setPriceRegular} />
+          <PriceField label="Harga Warung (antar warung / B2B)" value={priceB2B} onChange={setPriceB2B} />
+          <PriceField label="Harga Dus/Karton (opsional, referensi beli stok)" value={priceDus} onChange={setPriceDus} />
           <PriceField label="Harga Modal (untuk hitung keuntungan)" value={costPrice} onChange={setCostPrice} />
         </div>
 

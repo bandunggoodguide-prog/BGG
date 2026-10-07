@@ -36,10 +36,17 @@ export async function POST(request: NextRequest) {
     }
     const priceRegular = Number(body.priceRegular);
     const priceB2B = Number(body.priceB2B);
-    const priceDonation = Number(body.priceDonation);
     const costPrice = Number(body.costPrice ?? 0);
-    if (![priceRegular, priceB2B, priceDonation, costPrice].every((n) => Number.isFinite(n) && n >= 0)) {
+    if (![priceRegular, priceB2B, costPrice].every((n) => Number.isFinite(n) && n >= 0)) {
       return NextResponse.json({ error: "Harga tidak valid" }, { status: 400 });
+    }
+    const priceDusRaw = body.priceDus;
+    const priceDus =
+      priceDusRaw === null || priceDusRaw === undefined || priceDusRaw === ""
+        ? null
+        : Number(priceDusRaw);
+    if (priceDus !== null && !(Number.isFinite(priceDus) && priceDus >= 0)) {
+      return NextResponse.json({ error: "Harga Dus tidak valid" }, { status: 400 });
     }
 
     const barcodeRaw = body.barcode ? String(body.barcode).trim() : "";
@@ -55,7 +62,7 @@ export async function POST(request: NextRequest) {
         costPrice,
         priceRegular,
         priceB2B,
-        priceDonation,
+        priceDus,
         stock: Number(body.stock ?? 0),
         minStock: Number(body.minStock ?? 5),
         quickAccess: Boolean(body.quickAccess ?? true),

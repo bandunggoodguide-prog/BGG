@@ -24,11 +24,9 @@ export const GET = withOwnerGuard(async (request: NextRequest) => {
   const byType: Record<string, { count: number; totalAmount: number; totalCost: number }> = {
     UMUM: { count: 0, totalAmount: 0, totalCost: 0 },
     B2B: { count: 0, totalAmount: 0, totalCost: 0 },
-    DONASI: { count: 0, totalAmount: 0, totalCost: 0 },
   };
 
   const soldQtyByProduct = new Map<string, { qty: number; revenue: number; name: string }>();
-  const donationProductIds = new Set<string>();
 
   for (const t of transactions) {
     totalAmount += t.totalAmount;
@@ -43,25 +41,6 @@ export const GET = withOwnerGuard(async (request: NextRequest) => {
       entry.qty += item.qty;
       entry.revenue += item.subtotal;
       soldQtyByProduct.set(item.productId, entry);
-
-      if (t.customerType === "DONASI") donationProductIds.add(item.productId);
-    }
-  }
-
-  // Estimasi subsidi donasi: selisih antara harga umum produk saat ini dan harga yang dibayar.
-  let donationSubsidyEstimate = 0;
-  if (donationProductIds.size > 0) {
-    const productsForSubsidy = await prisma.product.findMany({
-      where: { id: { in: Array.from(donationProductIds) } },
-      select: { id: true, priceRegular: true },
-    });
-    const regularPriceMap = new Map(productsForSubsidy.map((p) => [p.id, p.priceRegular]));
-    for (const t of transactions) {
-      if (t.customerType !== "DONASI") continue;
-      for (const item of t.items) {
-        const regular = regularPriceMap.get(item.productId) ?? item.unitPrice;
-        donationSubsidyEstimate += Math.max(0, (regular - item.unitPrice) * item.qty);
-      }
     }
   }
 
@@ -77,7 +56,6 @@ export const GET = withOwnerGuard(async (request: NextRequest) => {
     profit: totalAmount - totalCost,
     transactionCount: transactions.length,
     byType,
-    donationSubsidyEstimate: Math.round(donationSubsidyEstimate),
     bestSellers,
   });
 });

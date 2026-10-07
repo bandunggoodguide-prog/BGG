@@ -31,7 +31,9 @@ export async function PUT(request: NextRequest, { params }: Params) {
         ...(body.costPrice !== undefined ? { costPrice: Number(body.costPrice) } : {}),
         ...(body.priceRegular !== undefined ? { priceRegular: Number(body.priceRegular) } : {}),
         ...(body.priceB2B !== undefined ? { priceB2B: Number(body.priceB2B) } : {}),
-        ...(body.priceDonation !== undefined ? { priceDonation: Number(body.priceDonation) } : {}),
+        ...(body.priceDus !== undefined
+          ? { priceDus: body.priceDus === null || body.priceDus === "" ? null : Number(body.priceDus) }
+          : {}),
         ...(body.minStock !== undefined ? { minStock: Number(body.minStock) } : {}),
         ...(body.stock !== undefined ? { stock: Number(body.stock) } : {}),
         ...(body.quickAccess !== undefined ? { quickAccess: Boolean(body.quickAccess) } : {}),

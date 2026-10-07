@@ -9,7 +9,7 @@ export type Product = {
   costPrice: number;
   priceRegular: number;
   priceB2B: number;
-  priceDonation: number;
+  priceDus: number | null;
   stock: number;
   minStock: number;
   quickAccess: boolean;
@@ -27,4 +27,4 @@ export type CartItem = {
   stock: number;
 };
 
-export type CustomerType = "UMUM" | "B2B" | "DONASI";
+export type CustomerType = "UMUM" | "B2B";

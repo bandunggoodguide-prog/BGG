@@ -3,15 +3,13 @@
 import type { CustomerType } from "@/lib/types";
 
 const OPTIONS: { value: CustomerType; label: string; hint: string; emoji: string }[] = [
-  { value: "UMUM", label: "Umum", hint: "Pembeli biasa", emoji: "🧑" },
-  { value: "B2B", label: "Grosir", hint: "Antar warung", emoji: "🏪" },
-  { value: "DONASI", label: "Donasi", hint: "Harga spesial", emoji: "❤️" },
+  { value: "UMUM", label: "Satuan", hint: "Pembeli biasa", emoji: "🧑" },
+  { value: "B2B", label: "Warung", hint: "Antar warung", emoji: "🏪" },
 ];
 
 const ACTIVE_CLASS: Record<CustomerType, string> = {
   UMUM: "border-blue-500 bg-blue-50 text-blue-700",
   B2B: "border-green-500 bg-green-50 text-green-700",
-  DONASI: "border-pink-500 bg-pink-50 text-pink-700",
 };
 
 export default function CustomerTypeSelector({
@@ -22,7 +20,7 @@ export default function CustomerTypeSelector({
   onChange: (v: CustomerType) => void;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-2 gap-2">
       {OPTIONS.map((opt) => {
         const active = value === opt.value;
         return (

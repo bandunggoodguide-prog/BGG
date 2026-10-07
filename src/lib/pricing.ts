@@ -1,24 +1,15 @@
-export type CustomerType = "UMUM" | "B2B" | "DONASI";
+export type CustomerType = "UMUM" | "B2B";
 
 export type ProductPricing = {
   priceRegular: number;
   priceB2B: number;
-  priceDonation: number;
 };
 
 export function priceForCustomerType(product: ProductPricing, type: CustomerType): number {
-  switch (type) {
-    case "B2B":
-      return product.priceB2B;
-    case "DONASI":
-      return product.priceDonation;
-    default:
-      return product.priceRegular;
-  }
+  return type === "B2B" ? product.priceB2B : product.priceRegular;
 }
 
 export const CUSTOMER_TYPES: { value: CustomerType; label: string; hint: string }[] = [
-  { value: "UMUM", label: "Umum", hint: "Pembeli biasa" },
-  { value: "B2B", label: "Grosir", hint: "Antar warung" },
-  { value: "DONASI", label: "Donasi", hint: "Harga spesial" },
+  { value: "UMUM", label: "Satuan", hint: "Pembeli biasa" },
+  { value: "B2B", label: "Warung", hint: "Antar warung" },
 ];

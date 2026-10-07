@@ -18,6 +18,7 @@ export default function ProdukClient() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("Semua");
   const [editing, setEditing] = useState<Product | null>(null);
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -38,13 +39,16 @@ export default function ProdukClient() {
   }, [load]);
 
   const categories = useMemo(() => Array.from(new Set(products.map((p) => p.category))).sort(), [products]);
+  const categoryPills = useMemo(() => ["Semua", ...categories], [categories]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return products.filter(
-      (p) => !q || p.name.toLowerCase().includes(q) || (p.barcode ?? "").includes(q)
-    );
-  }, [products, search]);
+    return products.filter((p) => {
+      if (category !== "Semua" && p.category !== category) return false;
+      if (q && !p.name.toLowerCase().includes(q) && !(p.barcode ?? "").includes(q)) return false;
+      return true;
+    });
+  }, [products, search, category]);
 
   function closeModal() {
     setEditing(null);
@@ -99,6 +103,20 @@ export default function ProdukClient() {
         >
           +
         </button>
+      </div>
+
+      <div className="flex gap-2 overflow-x-auto no-scrollbar mb-3 -mx-3 px-3">
+        {categoryPills.map((c) => (
+          <button
+            key={c}
+            onClick={() => setCategory(c)}
+            className={`btn-tap shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border ${
+              category === c ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-500 border-slate-200"
+            }`}
+          >
+            {c}
+          </button>
+        ))}
       </div>
 
       <div className="flex gap-2 mb-3">

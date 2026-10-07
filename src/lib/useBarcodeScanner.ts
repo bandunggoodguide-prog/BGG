@@ -43,17 +43,35 @@ export function useBarcodeScanner(
 
     async function start() {
       try {
-        const { Html5Qrcode } = await import("html5-qrcode");
+        const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import("html5-qrcode");
         if (cancelled) return;
-        const scanner = new Html5Qrcode(containerId, { verbose: false });
+        const scanner = new Html5Qrcode(containerId, {
+          verbose: false,
+          // Batasi ke format barcode 1D yang dipakai kemasan retail saja (bukan QR/2D) —
+          // mesin decode jadi tidak buang waktu mencoba format yang tidak relevan.
+          formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.UPC_EAN_EXTENSION,
+            Html5QrcodeSupportedFormats.CODE_128,
+            Html5QrcodeSupportedFormats.CODE_39,
+            Html5QrcodeSupportedFormats.CODABAR,
+            Html5QrcodeSupportedFormats.ITF,
+          ],
+          // Pakai BarcodeDetector native browser kalau didukung — jauh lebih cepat &
+          // lebih sensitif dibanding decoder JS murni, terutama untuk barcode kecil.
+          experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+        });
         scannerRef.current = scanner;
 
         await scanner.start(
           { facingMode: "environment" },
           {
-            fps: 12,
+            fps: 20,
             // Kotak lebar & pendek lebih cocok untuk barcode 1D dibanding kotak persegi.
-            qrbox: { width: 280, height: 130 },
+            qrbox: { width: 300, height: 150 },
             videoConstraints: {
               facingMode: "environment",
               // Resolusi lebih tinggi membantu kamera membedakan garis-garis tipis

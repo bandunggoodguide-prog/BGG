@@ -76,9 +76,9 @@ export default function CekHargaClient() {
           {result.barcode && <p className="text-[11px] text-slate-300 mb-4">{result.barcode}</p>}
 
           <div className="space-y-2 mt-4 text-left">
-            <PriceRow label="Harga Umum" value={result.priceRegular} emphasis />
-            <PriceRow label="Harga Grosir (B2B)" value={result.priceB2B} />
-            <PriceRow label="Harga Donasi" value={result.priceDonation} />
+            <PriceRow label="Harga Satuan" value={result.priceRegular} emphasis />
+            <PriceRow label="Harga Warung" value={result.priceB2B} />
+            {result.priceDus != null && <PriceRow label="Harga Dus/Karton" value={result.priceDus} />}
           </div>
 
           <div className={`mt-4 text-sm font-semibold ${low ? "text-red-500" : "text-slate-500"}`}>

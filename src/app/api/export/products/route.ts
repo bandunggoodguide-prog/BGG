@@ -12,9 +12,9 @@ export async function GET() {
     "Stok",
     "Stok Minimum",
     "Harga Modal",
-    "Harga Umum",
-    "Harga Grosir (B2B)",
-    "Harga Donasi",
+    "Harga Satuan",
+    "Harga Warung (B2B)",
+    "Harga Dus",
     "Status",
   ];
 
@@ -28,7 +28,7 @@ export async function GET() {
     p.costPrice,
     p.priceRegular,
     p.priceB2B,
-    p.priceDonation,
+    p.priceDus ?? "",
     p.active ? "Aktif" : "Nonaktif",
   ]);
 

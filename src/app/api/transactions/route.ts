@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
 
   const customerType = String(body.customerType ?? "UMUM") as CustomerType;
-  if (!["UMUM", "B2B", "DONASI"].includes(customerType)) {
+  if (!["UMUM", "B2B"].includes(customerType)) {
     return NextResponse.json({ error: "Jenis pembeli tidak valid" }, { status: 400 });
   }
 
