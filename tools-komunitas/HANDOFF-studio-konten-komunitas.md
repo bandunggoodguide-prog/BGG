@@ -1,0 +1,1115 @@
+# Handoff Proyek: Studio Konten Komunitas (River Cleanup Indonesia & Bank Sampah Warga)
+
+> **Untuk Claude di akun baru:** file ini adalah rangkuman lengkap percakapan sebelumnya antara aku (Bandung Good Guide / @BGG) dan Claude. Baca seluruh file ini, lalu lanjutkan pekerjaan dari bagian **"7. Pekerjaan berikutnya"**. Kode lengkap aplikasi ada di **Lampiran** paling bawah. Jawab dalam Bahasa Indonesia yang santai.
+>
+> Kalau memungkinkan, aku juga akan meng-upload ulang **"Niche Validation Report — River Cleanup Indonesia.pdf"** (28 halaman, 4 Okt 2026). Ringkasan isinya sudah ada di bagian 4.
+
+Tanggal handoff: 15 Oktober 2026
+
+---
+
+## 1. Ringkasan perjalanan percakapan
+
+1. **Awal:** Aku membagikan link Gemini Canvas `gemini.google.com/share/9e60796ba6d1`, berisi aplikasi **"Tools Kreator — Premium Assistant"**: menu Master Blueprint (asesmen DNA personal brand), Ideation Room, Script Builder, Video To Script, dll. Aku ingin mempersonalisasinya untuk River Cleanup dan kawan-kawan Bank Sampah.
+2. Claude tidak bisa membuka link Gemini (jaringan diblokir). Claude memberi cara mengambil kode: buka Canvas → remix/copy → tab **Kode**, atau pakai prompt "tampilkan seluruh kode tanpa diringkas".
+3. Aku meng-upload hasilnya (`tools_kreator_app.html`). Ternyata hasilnya **berbeda dari aslinya**: Gemini membuat ulang aplikasi tiruan, bukan kode asli. Tandanya: subjudul "AI Suite for Creators", ada input Gemini API Key, Blueprint berupa form biasa, dan tidak ada login. Tools Kreator adalah produk berbayar orang lain, jadi tiruan ini dipakai sebagai **kerangka milik sendiri** (untuk dipakai sendiri, tidak dijual ulang).
+4. **Hasil bedah tiruan itu:**
+   - 8 menu: Master Blueprint, Ideation, Script Builder, Video To Script, Content Repurposer, Viral Hook, Thumbnail & Title A/B, SEO & Metadata.
+   - Masalahnya:
+     - Model `gemini-1.5-flash` sudah tidak aktif.
+     - Hanya bisa satu profil.
+     - Hasil AI tidak tersimpan.
+     - Tampilan di HP sempit.
+5. **Keputusanku:**
+   - Dibuat khusus untuk **River Cleanup Indonesia** dan **Bank Sampah Warga**.
+   - **Tanpa Master Blueprint**: konteks tiap komunitas langsung tertanam di aplikasi.
+   - **Bank Sampah Warga** dibuat sederhana, hanya Instagram, TikTok, dan Threads, tanpa SEO/metadata YouTube.
+   - **River Cleanup** dibuat versi lengkap.
+6. Claude membangun **v1** (`tools-komunitas/index.html`). Karena analisa market belum ada di sesi itu, konteksnya disusun dari petunjuk di Google Drive (folder WCD 2026 Dago Elos, Pawai Bebas Plastik Bandung 2026) ditambah pengetahuan umum.
+7. Aku meng-upload **Niche Validation Report RCI** dan minta konteks Bank Sampah Warga diperdalam, khususnya bank sampah yang berada di **action zone River Cleanup**. Claude membangun **v2**: konteks RCI mengikuti laporan, Bank Sampah diperdalam, dan ada menu baru **"Cari Ciri Khas"**.
+8. Semua versi sudah diuji di browser headless (desktop 1280px dan HP 390px) dengan panggilan AI tiruan. **Panggilan ke Gemini sungguhan belum diuji**, karena perlu API key milikku.
+
+---
+
+## 2. Keputusan & preferensi yang sudah ditetapkan
+
+- **Bahasa:** Indonesia santai, boleh sisipan Sunda ringan (hayu, mangga, nuhun, punten).
+- **Tanpa form Master Blueprint.** Konteks ditanam di kode (objek `KONTEKS`) supaya mudah diedit.
+- **Bank Sampah Warga:**
+  - Sederhana, hanya **Instagram, TikTok, Threads**, tanpa SEO YouTube.
+  - Sedang mencari ciri khas (niche).
+- **River Cleanup:** versi lengkap, termasuk YouTube/SEO, LinkedIn, WhatsApp, dan kemitraan CSR.
+- **AI tidak boleh mengarang** angka, harga, jadwal, alamat, atau nama. Kalau data tidak ada, AI menulis `[placeholder]` / `[isi ...]`.
+- **Bentuk aplikasi:** satu file HTML yang dibuka di browser HP atau laptop, atau ditempel ke Gemini Canvas. API key Gemini disimpan di browser masing-masing pengguna.
+
+---
+
+## 3. Spesifikasi aplikasi "Studio Konten Komunitas" (v2)
+
+**Teknis**
+- Satu file `index.html` tanpa library eksternal: CSS dan JS murni, ikon emoji.
+- Memanggil Gemini REST API `v1beta/models/{model}:generateContent` dengan `systemInstruction` berisi konteks komunitas.
+- **Model:** urutan cadangan `gemini-flash-latest` → `gemini-2.5-flash`, bisa diganti manual di ⚙️ Pengaturan. Kalau server membalas 429 atau 5xx, permintaan dicoba ulang. Kalau 404, pindah ke model berikutnya.
+- Tanpa API key tetap mencoba memanggil (berfungsi kalau dibuka di dalam Gemini Canvas).
+- **Data di localStorage:**
+  - `sk_mode`, `sk_key`, `sk_model`
+  - `sk_info_bs` (info bank sampah)
+  - `sk_riwayat_rc` dan `sk_riwayat_bs` (30 hasil terakhir per komunitas)
+- Pengubah Markdown → HTML buatan sendiri (judul, tebal, daftar, tabel), dengan escape HTML supaya aman.
+- **Fitur dibangun dari konfigurasi** di objek `FITUR`. Tipe field: `text`, `textarea`, `select`, `checks`, `radios`. Setiap fitur punya `prompt: v => ...`.
+- **Tampilan:**
+  - Terang, warna aksen biru untuk RC dan hijau untuk BS.
+  - Sidebar di desktop; di HP (≤860px) menu berubah jadi tombol geser di bagian atas.
+  - Tombol Salin dan menu Riwayat (salin, unduh `.md`, hapus).
+
+**🌊 River Cleanup Indonesia — 9 menu**
+1. **Ide Konten:** pilih pilar (10 pilar), audiens, momen, platform, jumlah ide.
+2. **Script Video:** tabel Waktu | Ucapan | Visual | Teks layar, lalu caption, hashtag, dan tips rekam.
+3. **Ajakan Relawan / Info Aksi:** teks poster, caption IG, TikTok 15 detik, Threads, broadcast WA, pengingat H-1, dan ajakan "langkah berikutnya".
+4. **Laporan Aksi & Angka Bulan Ini:** termasuk kolom merek (brand audit). Hasilnya carousel, caption, thread, laporan untuk mitra, dan ucapan terima kasih untuk relawan.
+5. **Satu Materi, Banyak Platform:** IG, TikTok, Threads, X, LinkedIn, WA, Newsletter.
+6. **Hook Pembuka:** 12 hook dalam 6 kategori.
+7. **Judul & Thumbnail.**
+8. **SEO YouTube.**
+9. **Pesan Kemitraan:** paket CSR employee cleanup, sponsor infrastruktur, brand audit/EPR, sekolah, Pemkot/DLH, kampus, media.
+
+**♻️ Bank Sampah Warga — 5 menu + kotak info**
+- **Kotak info** (diisi sekali, otomatis ikut ke semua fitur): nama, lokasi RW/kelurahan, sungai terdekat, jadwal timbang, kontak/IG, ciri khas terpilih, jenis sampah dan harganya.
+1. **🧭 Cari Ciri Khas ("mulai di sini"):** menghasilkan 3 pilihan niche (tagline, sasaran, masalah yang dijawab, pembeda, 3 contoh postingan), lalu rekomendasi dan kalimat bio.
+2. **Ide Postingan:** pilih tujuan dan tema (7 pilar).
+3. **Bikin Postingan:** topik dan platform. IG: slide carousel + caption. TikTok: script 30 detik. Threads: 3–5 post.
+4. **Ajak Jadi Nasabah:** 6 sasaran (termasuk pemilik warung dan follower RCI) dan 6 alasan (termasuk "pilahanmu tidak sia-sia").
+5. **Kabar Bank Sampah:** hasil timbang, harga, jadwal, "ke mana sampah setoran kita pergi", darurat TPS, terima kasih, nasabah baru.
+
+---
+
+## 4. Konteks River Cleanup Indonesia (ringkasan Niche Validation Report, 4 Okt 2026)
+
+- **Verdict:** GO, tapi dipersempit dari "NGO bersih sungai" menjadi **"gerakan pencegahan sampah dari hulu Citarum untuk warga & sekolah Bandung"**.
+- **Positioning terbaik: "Cegah dari Hulu".**
+  - Tagline: *"Sungai bersih dimulai dari rumahmu."*
+  - One-liner: *RCI menunjukkan ke mana sampahmu pergi, dan membantumu memutusnya sebelum sampai ke sungai.*
+- **Fakta resmi (pakai angka ini secara seragam):**
+  - Aktif sejak 2019 di hulu Citarum, Bandung.
+  - 611 event, 34.525 River Warriors, 658.426 kg sampah tercatat, 14 staf penuh waktu, truk "River Beast".
+  - Plastic Clever Schools bersama Common Seas: 20 sekolah (10 Bandung, 10 Surabaya), 7.800+ siswa.
+  - Program lain: Sekolah Sungai Sabtu, bank sampah, dapur minim plastik, ecobin, sorting station, trash barrier, brand audit.
+  - Bagian dari jaringan River Cleanup global (misi 1.000 sungai bersih pada 2050).
+  - Agenda: River Cleanup Day 17 Okt 2026 di Sungai Ciroyom; WCD 2026 di Dago Elos.
+- **Konteks Bandung:**
+  - Darurat sampah sejak 2023 (TPA Sarimukti terbakar).
+  - Kota Bandung menghasilkan ±1.500 ton/hari dengan selisih ±200 ton/hari tidak terolah.
+  - Sampah anorganik dilarang masuk Sarimukti; Sarimukti bertahan sampai ±Juni 2028 menunggu Legok Nangka.
+  - Di Cimahi (2025) sampah yang tidak dipilah tidak diangkut.
+- **Audiens:**
+  - **Utama:** "Warga Bandung peduli yang bingung mulai dari mana". Usia 25–44 (61,8% follower IG), orang tua muda, pekerja, guru. Posting sore–malam, puncak 18–21.
+  - **Sekunder:** relawan 18–24, sekolah & guru, CSR & donor.
+  - **Bukan target:** penonton "sungai kotor viral", aktivis kebijakan nasional, audiens di luar Jawa Barat.
+- **3 pain terkuat:**
+  1. Sampah balik ke rumah sendiri (TPS penuh, ditolak angkut, banjir).
+  2. Rasa "percuma dipilah".
+  3. Takut mewariskan masalah ke anak.
+- **Job to be done:** "Bantu saya melakukan hal kecil yang benar dan *terbukti* sampai ujungnya."
+- **Pesaing:**
+  - Pandawara Group (perhatian publik): jangan meniru format "cleanup dramatis".
+  - Sungai Watch (donor/CSR).
+  - Kang Pisman/YPBB (edukasi tingkat RW).
+- **White space:**
+  1. Jejak sampah rumah → sungai.
+  2. Sekolah & anak.
+  3. Data/brand audit Citarum.
+- **10 pilar konten:**
+  1. Ke Mana Sampahmu Pergi?
+  2. Masuk Mana?
+  3. Krisis Sampah Bandung Versi Warga
+  4. Anak-Anak Sungai
+  5. Sekolah Berubah
+  6. Dapur Minim Plastik
+  7. Temuan Sungai
+  8. Angka Bulan Ini
+  9. Orang di Balik Sungai
+  10. Ikut Yuk
+- **Ritme:** 3–4 konten/minggu, dominan pilar 1, 2, 4, 8.
+- **Pendanaan:** uang terbesar dari B2B (CSR, sponsor, grant), bukan dari follower. Tangganya: cleanup sehari → program edukasi → sponsor infrastruktur.
+- **Jangan dilakukan:**
+  - Meniru Pandawara.
+  - Menyalahkan warga; bingkai sebagai tanggung jawab bersama, termasuk produsen.
+  - Menyerang pemkot atau sponsor secara frontal.
+  - Memakai angka yang tidak konsisten.
+  - Menyasar seluruh Indonesia.
+- **Gaya:** "Kami – Kamu"; hangat, membumi khas Bandung; edukatif tanpa menggurui; berbasis data; optimis.
+- **Validasi lanjutan yang disarankan laporan (4–6 minggu):**
+  - Tarik data IG: konten terbaik dan tab Cities.
+  - Uji A/B konten preventif vs konten cleanup.
+  - Baca 100 komentar/DM.
+  - Polling Story.
+  - Buat laporan data bulanan.
+  - Wawancara 5 guru/orang tua dan 3 kontak CSR.
+
+---
+
+## 5. Konteks Bank Sampah Warga (di action zone RCI)
+
+- **Lokasi:** bank sampah di kampung tepi anak-anak sungai Citarum tempat RCI bekerja setiap hari, digerakkan warga bersama RCI. Pengurusnya warga biasa; mereka sedang mencari nasabah dan ciri khas.
+- **Peran dalam gerakan RCI:**
+  - Wujud paling nyata dari "Cegah dari Hulu".
+  - Bukti bahwa memilah tidak sia-sia.
+  - "Langkah berikutnya" setelah ikut aksi bersih sungai. Ini menutup celah journey langkah 7 ke 8 di laporan, yaitu dari aksi sekali menjadi kebiasaan di rumah.
+- **Audiens:**
+  1. Warga sekitar: ibu rumah tangga, keluarga muda, RT/RW, PKK, pemilik warung/kios, anak kos.
+  2. Warga Bandung 25–44 yang mencari "bank sampah terdekat". Di laporan, pertanyaan ini masuk niat tinggi.
+  3. Anak-anak & sekolah, dijangkau lewat orang tua dan guru.
+  4. Relawan & follower RCI.
+- **Kalimat warga** (masih hipotesis, perlu divalidasi dari komentar/DM):
+  - "Sampah udah 3 hari nggak diangkut."
+  - "Ini plastik masuk mana sih?"
+  - "Percuma dipilah, nanti dicampur lagi."
+  - "Tiap hujan banjir lagi."
+  - "Ribet."
+  - "Laku berapa sih?"
+  - "Nanti dibilang sok peduli."
+- **Alternatif yang dipilih warga:** bank sampah lain (kecil, hampir tidak punya konten, jadi ini peluang), Kang Pisman/YPBB, jasa angkut berbayar, dan "do nothing" (dibakar atau dibuang ke sungai).
+- **Kelebihan:** dekat rumah, dikelola tetangga sendiri, didampingi RCI di sungai yang sama.
+- **7 pilar:**
+  1. Masuk Mana?
+  2. Berapa Rupiah?
+  3. Ke Mana Sampahmu Pergi?
+  4. Tetangga Hebat
+  5. Kabar Timbang
+  6. Sungai Kita
+  7. Darurat TPS
+- **Gaya:**
+  - Sangat sederhana, seperti tetangga ngobrol. Suara "kami" (pengurus) ke "kamu/warga".
+  - Bukti nyata: timbangan, karung, buku tabungan, angka kg.
+  - Ajakan konkret: kapan, di mana, bawa apa.
+
+---
+
+## 6. Status file & repo
+
+- **Repo GitHub:** `bandunggoodguide-prog/BGG`, branch `claude/optimistic-knuth-68b3rn`, file `tools-komunitas/index.html`.
+- **Commit:** `0096dfe` (v1) dan `f89af4d` (v2).
+- Repo ini aslinya berisi aplikasi kasir **Toko Arief POS** (Next.js + Prisma). Folder `tools-komunitas/` terpisah dan tidak memengaruhi aplikasi kasir.
+- Belum ada pull request.
+
+---
+
+## 7. Pekerjaan berikutnya (belum dikerjakan)
+
+1. **Uji dengan Gemini sungguhan:** isi API key (gratis di aistudio.google.com/apikey) di ⚙️, coba tiap fitur, lalu laporkan kalau ada error atau hasil yang kurang pas.
+2. **Data lokasi bank sampah di action zone RCI:** nama, kampung/RW, dan sungai masing-masing bank sampah belum diketahui. Bisa ditambahkan ke konteks atau jadi pilihan daftar.
+3. **Kalimat warga asli:** setelah membaca komentar/DM IG (validasi laporan), ganti kalimat hipotesis di `KONTEKS` dengan bahasa asli audiens.
+4. **Harga & jenis sampah asli** tiap bank sampah, untuk diisi di kotak info.
+5. **Ide lanjutan (opsional):**
+   - Hosting jadi link supaya teman-teman Bank Sampah tinggal buka. Pilihannya GitHub Pages atau Netlify, atau tempel ke Gemini Canvas lalu share.
+   - Kalender konten mingguan otomatis (3–4 konten/minggu sesuai ritme laporan).
+   - Ekspor hasil ke Google Docs/Sheets.
+
+---
+
+## Lampiran: Kode lengkap `tools-komunitas/index.html` (v2)
+
+Simpan isi blok di bawah sebagai `index.html`, lalu buka di browser.
+
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Konten Komunitas</title>
+<style>
+  :root {
+    --bg: #f4f7f6;
+    --card: #ffffff;
+    --text: #1d2a2a;
+    --muted: #5f6f6f;
+    --line: #dfe7e5;
+    --accent: #0b6fa4;
+    --accent-soft: #e3f1f9;
+    --accent-text: #ffffff;
+    --danger: #b3261e;
+    --radius: 14px;
+  }
+  body.mode-bs { --accent: #2e7d32; --accent-soft: #e6f4e7; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+
+  /* Header */
+  .top { position: sticky; top: 0; z-index: 10; background: var(--card); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; padding: 10px 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .logo { width: 38px; height: 38px; border-radius: 10px; background: var(--accent); color: var(--accent-text); display: grid; place-items: center; font-size: 20px; flex-shrink: 0; }
+  .brand h1 { font-size: 16px; margin: 0; white-space: nowrap; }
+  .brand p { font-size: 12px; margin: 0; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .switch { margin-left: auto; display: flex; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+  .switch button { border: 0; background: none; padding: 6px 12px; border-radius: 999px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+  .switch button.on { background: var(--accent); color: var(--accent-text); }
+  .icon-btn { border: 1px solid var(--line); background: var(--card); width: 38px; height: 38px; border-radius: 10px; cursor: pointer; font-size: 17px; flex-shrink: 0; }
+
+  /* Layout */
+  .wrap { display: flex; max-width: 1180px; margin: 0 auto; }
+  nav { width: 250px; flex-shrink: 0; padding: 18px 12px; position: sticky; top: 59px; align-self: flex-start; }
+  nav .group { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 10px 6px; }
+  nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0; background: none; padding: 9px 10px; border-radius: 10px; cursor: pointer; font-size: 14px; }
+  nav button:hover { background: var(--accent-soft); }
+  nav button.on { background: var(--accent); color: var(--accent-text); font-weight: 600; }
+  nav .ico { width: 22px; text-align: center; }
+  main { flex: 1; min-width: 0; padding: 18px 16px 60px; }
+
+  /* Cards & forms */
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+  .card h2 { font-size: 18px; margin: 0 0 4px; }
+  .card .desc { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: 13px; font-weight: 600; }
+  .field label .req { color: var(--danger); }
+  .field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; background: #fbfcfc; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; background: #fff; }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px; }
+  .checks label, .radios label { display: flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; background: #fbfcfc; }
+  .checks input, .radios input { accent-color: var(--accent); }
+  .radios { display: flex; flex-wrap: wrap; gap: 8px; }
+  .primary { width: 100%; margin-top: 14px; border: 0; background: var(--accent); color: var(--accent-text); padding: 12px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; }
+  .primary:disabled { opacity: .6; cursor: wait; }
+  .ghost { border: 1px solid var(--line); background: var(--card); padding: 6px 12px; border-radius: 9px; font-size: 13px; cursor: pointer; }
+  .ghost.danger { color: var(--danger); }
+  details.info { background: var(--accent-soft); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; }
+  details.info summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+  details.info .grid { margin-top: 12px; }
+
+  /* Result */
+  .result-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+  .result-head h3 { margin: 0; font-size: 15px; }
+  .out { font-size: 14.5px; overflow-wrap: anywhere; }
+  .out h1, .out h2, .out h3, .out h4 { font-size: 15.5px; margin: 18px 0 6px; color: var(--accent); }
+  .out p { margin: 6px 0; }
+  .out ul, .out ol { margin: 6px 0; padding-left: 22px; }
+  .out hr { border: 0; border-top: 1px dashed var(--line); margin: 16px 0; }
+  .out .tbl { overflow-x: auto; }
+  .out table { border-collapse: collapse; width: 100%; font-size: 13.5px; margin: 8px 0; }
+  .out th, .out td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+  .out th { background: var(--accent-soft); }
+  .loading { color: var(--muted); display: flex; gap: 8px; align-items: center; }
+  .spin { width: 16px; height: 16px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: s 0.8s linear infinite; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  .err { color: var(--danger); }
+
+  /* History */
+  .hist-item { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; background: var(--card); }
+  .hist-item summary { cursor: pointer; padding: 10px 14px; display: flex; justify-content: space-between; gap: 10px; font-size: 14px; }
+  .hist-item summary span:last-child { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .hist-body { padding: 0 14px 14px; }
+  .empty { color: var(--muted); text-align: center; padding: 30px 0; }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+  .modal.show { display: flex; }
+  .modal .card { width: 100%; max-width: 460px; margin: 0; }
+  .note { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: #1d2a2a; color: #fff; padding: 9px 16px; border-radius: 999px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 60; }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 860px) {
+    .wrap { display: block; }
+    nav { width: auto; position: sticky; top: 59px; z-index: 5; background: var(--bg); padding: 8px 12px; display: flex; gap: 6px; overflow-x: auto; border-bottom: 1px solid var(--line); }
+    nav .group { display: none; }
+    nav button { width: auto; white-space: nowrap; border: 1px solid var(--line); background: var(--card); padding: 7px 12px; font-size: 13px; }
+    main { padding: 14px 16px 60px; }
+    .grid { grid-template-columns: 1fr; }
+    .brand p { display: none; }
+  }
+  @media (max-width: 480px) {
+    .brand h1 { display: none; }
+    .switch button { padding: 6px 10px; font-size: 12.5px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="logo" id="logo">🌊</div>
+    <div>
+      <h1>Studio Konten Komunitas</h1>
+      <p id="brand-sub">River Cleanup Indonesia</p>
+    </div>
+  </div>
+  <div class="switch">
+    <button data-mode="rc" onclick="gantiMode('rc')">🌊 River Cleanup</button>
+    <button data-mode="bs" onclick="gantiMode('bs')">♻️ Bank Sampah</button>
+  </div>
+  <button class="icon-btn" title="Pengaturan" onclick="bukaPengaturan()">⚙️</button>
+</header>
+
+<div class="wrap">
+  <nav id="menu"></nav>
+  <main id="panel"></main>
+</div>
+
+<div class="modal" id="modal" onclick="if (event.target === this) tutupPengaturan()">
+  <div class="card">
+    <h2>⚙️ Pengaturan</h2>
+    <p class="desc">Disimpan hanya di browser ini.</p>
+    <div class="field">
+      <label for="set-key">Gemini API Key</label>
+      <input type="password" id="set-key" placeholder="AIza...">
+      <div class="note">Ambil gratis di aistudio.google.com/apikey. Kalau file ini dibuka di dalam Gemini Canvas, boleh dikosongkan.</div>
+    </div>
+    <div class="field" style="margin-top:12px">
+      <label for="set-model">Model (opsional)</label>
+      <input type="text" id="set-model" placeholder="Kosongkan = otomatis">
+      <div class="note">Isi hanya kalau Google mengganti nama model, misalnya "gemini-2.5-flash".</div>
+    </div>
+    <button class="primary" onclick="simpanPengaturan()">Simpan</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   KONTEKS — ini "otak" AI untuk tiap komunitas.
+   Silakan edit teks di bawah kalau ada info baru (program, data, gaya bahasa).
+   ===================================================================== */
+const KONTEKS = {
+  rc: {
+    nama: 'River Cleanup Indonesia',
+    logo: '🌊',
+    teks: `Kamu adalah tim konten River Cleanup Indonesia (RCI).
+
+POSITIONING: "CEGAH DARI HULU"
+- Tagline: "Sungai bersih dimulai dari rumahmu."
+- One-liner: RCI menunjukkan ke mana sampahmu pergi, dan membantumu memutusnya sebelum sampai ke sungai.
+- RCI BUKAN sekadar "tim bersih-bersih sungai". Cleanup dipakai sebagai bukti dan pintu masuk (hook visual), bukan identitas utama. Identitasnya: gerakan pencegahan sampah dari hulu Citarum untuk warga & sekolah Bandung, berbasis data.
+- USP: satu-satunya gerakan di Bandung yang turun ke sungai setiap hari DAN mengubah kebiasaan di rumah & sekolah, dengan data sendiri dan jaringan global River Cleanup.
+
+FAKTA RCI (resmi, Okt 2026 — pakai angka ini secara konsisten, jangan pakai angka lain)
+- Aktif di Bandung sejak 2019, di anak-anak sungai Citarum (hulu Citarum).
+- 611 event, 34.525 River Warriors (relawan), 658.426 kg (±658 ton) sampah tercatat; 14 staf penuh waktu; crew harian & truk "River Beast".
+- Program: aksi bersih sungai rutin, Sekolah Sungai Sabtu (anak-anak), Plastic Clever Schools bersama Common Seas (pilot 20 sekolah: 10 Bandung, 10 Surabaya; 7.800+ siswa; semua sekolah menuntaskan program), bank sampah bersama warga, dapur minim plastik, ecobin, sorting station, trash barrier, brand audit (data merek sampah).
+- Bagian dari jaringan River Cleanup internasional (misi 1.000 sungai bersih pada 2050).
+- Agenda: River Cleanup Day 17 Oktober 2026 di Sungai Ciroyom; World Cleanup Day 2026 di Dago Elos.
+
+KONTEKS BANDUNG (pakai bila relevan)
+- Bandung Raya darurat sampah sejak 2023 (TPA Sarimukti terbakar Agustus 2023). Kota Bandung menghasilkan ±1.500 ton sampah/hari; masih ada selisih ±200 ton/hari yang tidak terolah (2026).
+- Sampah anorganik dilarang masuk Sarimukti; Sarimukti diperkirakan bertahan sampai ±Juni 2028 menunggu TPPAS Legok Nangka. Di Cimahi (2025) sampah yang tidak dipilah sampai tidak diangkut. Arah kebijakan: dari "angkut-buang" ke "pilah dari sumber".
+
+AUDIENS
+1. UTAMA — "Warga Bandung peduli yang bingung mulai dari mana": 25–44 tahun (61,8% follower IG), orang tua muda, pekerja, guru. Terganggu sampah & banjir, ingin jadi "orang baik" tanpa harus jadi aktivis, takut terlihat sok suci, frustrasi karena "sudah dipilah tapi ujungnya dicampur lagi". Percaya bukti visual sebelum-sesudah, tokoh lokal, dan sekolah anaknya.
+2. Relawan 18–24 (River Warriors): cari pengalaman, komunitas, portofolio.
+3. Sekolah, guru, orang tua: butuh program lingkungan siap jalan (P5, Adiwiyata).
+4. CSR & donor: butuh dampak terukur, laporan data, bukan sekadar seremoni.
+BUKAN target: penonton yang hanya mencari hiburan "sungai kotor viral", aktivis kebijakan nasional, audiens di luar Jawa Barat.
+
+MASALAH UTAMA AUDIENS (bahan hook)
+- "Sampah udah 3 hari nggak diangkut." · "Ini plastik masuk mana sih?" · "Percuma dipilah, nanti dicampur lagi sama petugas." · "Tiap hujan banjir lagi." · "Masalahnya kegedean, saya bisa apa?" · "Gimana ngajarin anak nggak buang sampah sembarangan?" · "Duitnya beneran buat sungai?" · "Nanti dibilang sok zero waste." · "Kenapa warga terus yang disalahin?"
+- 3 pain terkuat: (1) sampah balik ke rumah sendiri (TPS penuh, ditolak angkut, banjir); (2) rasa "percuma" memilah; (3) takut mewariskan masalah ke anak.
+- Job to be done: "Saat sampah menumpuk dan saya merasa bersalah, bantu saya melakukan hal kecil yang benar dan terbukti sampai ujungnya, supaya saya merasa jadi bagian dari solusi."
+
+10 PILAR KONTEN
+1. Ke Mana Sampahmu Pergi? (jejak sampah rumah → TPS → sungai/sorting) 2. Masuk Mana? (kuis & panduan pilah) 3. Krisis Sampah Bandung, Versi Warga 4. Anak-Anak Sungai (Sekolah Sungai Sabtu) 5. Sekolah Berubah (Plastic Clever Schools) 6. Dapur Minim Plastik 7. Temuan Sungai (barang aneh minggu ini) 8. Angka Bulan Ini (kg, titik, warrior, brand audit) 9. Orang di Balik Sungai (crew harian, relawan) 10. Ikut Yuk (ajakan aksi & kolaborasi).
+- Ritme: 3–4 konten/minggu, dominan pilar 1, 2, 4, 8. Posting sore–malam (puncak 18.00–21.00).
+
+PESAING & PEMBEDA
+- Pandawara Group menguasai format "video cleanup dramatis sebelum-sesudah". JANGAN meniru format itu sebagai konten utama; RCI menang di pencegahan, data, sekolah, dan kerja harian.
+- Sungai Watch (donor/CSR, berbasis Bali/Jatim), Kang Pisman/YPBB (edukasi tingkat RW).
+
+GAYA BAHASA
+- Suara organisasi "Kami – Kamu" ("Aku – Kamu" boleh untuk konten personal tim/relawan).
+- Hangat, santai, membumi khas Bandung (boleh sisipan Sunda ringan: hayu, mangga, nuhun). Untuk mitra/sponsor: sopan dan profesional.
+- Edukatif tapi tidak menggurui, TIDAK menyalahkan warga (bingkai tanggung jawab bersama, termasuk produsen kemasan), tidak menyerang pemkot/sponsor secara frontal (kritik dengan data dan solusi), tidak menakut-nakuti.
+- Selalu berbasis data dan cerita lapangan nyata; ajakan kecil yang konkret dan bisa dilakukan minggu ini.
+- JANGAN mengarang angka, statistik, nama orang, tanggal, atau kutipan di luar fakta di atas. Bila data tidak ada, tulis [placeholder] seperti [jumlah kg] atau [link daftar].`
+  },
+  bs: {
+    nama: 'Bank Sampah Warga',
+    logo: '♻️',
+    teks: `Kamu membantu pengurus Bank Sampah Warga di Bandung. Bank sampah ini berada di "action zone" River Cleanup Indonesia (RCI): kampung di tepi anak-anak sungai Citarum tempat tim RCI membersihkan sungai setiap hari. Bank sampah digerakkan warga setempat bersama RCI. Pengurusnya warga biasa, bukan ahli konten, dan sedang mencari nasabah serta ciri khas (niche) bank sampahnya.
+
+PERAN BANK SAMPAH DALAM GERAKAN RCI
+- RCI memakai positioning "Cegah dari Hulu — Sungai bersih dimulai dari rumahmu". Bank sampah adalah wujud paling nyata: sampah dicegah di rumah, sebelum sampai ke sungai depan kampung.
+- Bank sampah menjawab rasa "percuma dipilah": warga melihat sendiri sampahnya ditimbang, dicatat jadi tabungan, dan tidak berakhir di sungai.
+- Bank sampah adalah "langkah berikutnya" setelah ikut aksi bersih sungai: dari aksi sekali jadi kebiasaan rutin di rumah.
+- Cara kerja umum: warga memilah di rumah (plastik, kertas/kardus, botol, kaleng/logam, dll.), menyetor saat jadwal timbang, sampah ditimbang dan dicatat jadi saldo tabungan.
+
+SITUASI BANDUNG (pakai bila relevan, jangan berlebihan)
+- Bandung Raya darurat sampah sejak 2023 (TPA Sarimukti terbakar). Sampah anorganik dilarang masuk Sarimukti; TPS sering penuh dan sampah telat diangkut. Di Cimahi (2025) sampah yang tidak dipilah sampai tidak diangkut. Warga "dipaksa" belajar memilah.
+
+AUDIENS
+1. UTAMA — warga sekitar bank sampah: ibu rumah tangga, keluarga muda, pengurus RT/RW, PKK, pemilik warung/kios (banyak sampah kemasan), anak kos.
+2. Warga Bandung lain usia 25–44 yang sudah/ingin memilah dan mencari "bank sampah terdekat di Bandung" — banyak yang belum tahu bank sampah ini ada.
+3. Anak-anak & sekolah dekat kampung (dijangkau lewat orang tua & guru).
+4. Relawan & follower RCI yang ingin melanjutkan aksi di rumah.
+
+MASALAH & KALIMAT WARGA (bahan hook)
+- "Sampah udah 3 hari nggak diangkut." (TPS penuh)
+- "Ini plastik masuk mana sih?" (bingung memilah)
+- "Percuma dipilah, nanti dicampur lagi." (merasa sia-sia)
+- "Tiap hujan banjir lagi." (sampah → selokan → sungai → banjir)
+- "Ribet, nggak ada waktu." · "Sampah segini laku berapa sih?" · "Nanti dibilang sok peduli."
+KEINGINAN: rumah & gang bersih, tidak kebanjiran, sampah jadi bernilai ("nggak rugi"), tahu cara memilah yang benar, anak punya kebiasaan baik, merasa ikut jadi solusi, punya tetangga yang sepemikiran.
+
+ALTERNATIF YANG DIPILIH WARGA: bank sampah lain (umumnya kecil dan hampir tidak punya konten — ini peluang), program Kang Pisman/YPBB di tingkat RW, jasa angkut sampah berbayar, dan kebiasaan "do nothing" (dibakar, dibuang ke sungai, diserahkan ke petugas).
+KELEBIHAN KAMI: dekat rumah, dikelola tetangga sendiri, dan didampingi RCI yang setiap hari bekerja di sungai yang sama — kami bisa menunjukkan langsung bahwa sampah yang disetor tidak berakhir di sungai depan kampung.
+
+PILAR KONTEN
+1. Masuk Mana? — kuis & panduan pilah
+2. Berapa Rupiah? — nilai sampah, plastik laku vs tidak laku (pakai harga asli saja)
+3. Ke Mana Sampahmu Pergi? — perjalanan setoran: rumah → timbang → pengepul/daur ulang, bukan ke sungai
+4. Tetangga Hebat — cerita nasabah, pengurus, anak-anak yang ikut setor
+5. Kabar Timbang — angka kg & jumlah nasabah
+6. Sungai Kita — kondisi sungai dekat kampung & kerja harian RCI
+7. Darurat TPS — yang bisa dilakukan saat sampah tidak diangkut
+
+GAYA BAHASA
+- Sangat sederhana dan ramah, kalimat pendek, seperti tetangga ngobrol; sapaan Sunda ringan boleh (hayu, mangga, nuhun, punten, Akang/Teteh/Ibu).
+- Suara "kami" (pengurus) ke "kamu/warga". Tidak menggurui, tidak menyalahkan warga, tidak menyerang pemerintah atau petugas.
+- Tonjolkan bukti nyata: foto timbangan, karung, buku tabungan, angka kg, wajah tetangga (dengan izin).
+- Ajakan selalu konkret dan mudah: kapan, di mana, bawa apa.
+- Hindari istilah teknis dan istilah marketing. Waktu posting terbaik sore–malam (18.00–21.00).
+- JANGAN mengarang harga, jadwal, alamat, kontak, nama, atau angka. Bila tidak diberikan, tulis [isi ...] seperti [isi jadwal timbang].
+
+PLATFORM: hanya Instagram, TikTok, dan Threads.`
+  }
+};
+
+const ATURAN_FORMAT = `
+ATURAN JAWABAN
+- Bahasa Indonesia. Langsung ke hasil tanpa kalimat pembuka atau penutup basa-basi.
+- Format Markdown sederhana: judul bagian pakai "### ", **tebal**, daftar "- ", tabel "|" bila diminta.
+- Hashtag secukupnya dan relevan (maks. 8), campur hashtag lokal Bandung bila cocok.`;
+
+/* =====================================================================
+   MENU & FITUR
+   Tipe field: text, textarea, select, checks (pilih banyak), radios (pilih satu)
+   ===================================================================== */
+const MOMEN = ['Tidak ada momen khusus', 'River Cleanup Day (17 Okt 2026, Sungai Ciroyom)', 'World Cleanup Day (Sept)', 'Hari Peduli Sampah Nasional (21 Feb)', 'Hari Air Sedunia (22 Mar)', 'Hari Bumi (22 Apr)', 'Hari Lingkungan Hidup Sedunia (5 Jun)', 'Hari Sungai Nasional (27 Jul)', 'Tahun ajaran baru (Juli)', 'Setelah Lebaran (lonjakan sampah)', 'Musim hujan & banjir', 'TPS penuh / sampah tidak diangkut'];
+
+const PILAR_RC = ['Campuran (ritme ideal: dominan pilar 1, 2, 4, 8)', '1. Ke Mana Sampahmu Pergi?', '2. Masuk Mana? (kuis pilah)', '3. Krisis Sampah Bandung, Versi Warga', '4. Anak-Anak Sungai (Sekolah Sungai Sabtu)', '5. Sekolah Berubah (Plastic Clever Schools)', '6. Dapur Minim Plastik', '7. Temuan Sungai', '8. Angka Bulan Ini (data & brand audit)', '9. Orang di Balik Sungai', '10. Ikut Yuk (ajakan aksi)'];
+
+const PILAR_BS = ['Campuran', 'Masuk Mana? (cara pilah)', 'Berapa Rupiah? (nilai sampah)', 'Ke Mana Sampahmu Pergi?', 'Tetangga Hebat (cerita nasabah)', 'Kabar Timbang', 'Sungai Kita', 'Darurat TPS'];
+
+const FITUR = {
+  rc: [
+    { group: 'Bikin Konten' },
+    {
+      id: 'ide', ico: '💡', judul: 'Ide Konten',
+      desc: 'Ide konten "Cegah dari Hulu" sesuai pilar, audiens, dan momen.',
+      fields: [
+        { id: 'pilar', label: 'Pilar konten', type: 'select', options: PILAR_RC },
+        { id: 'audiens', label: 'Untuk siapa', type: 'select', options: ['Warga & orang tua Bandung 25–44 (utama)', 'Calon relawan 18–24', 'Sekolah & guru', 'CSR & donor'] },
+        { id: 'momen', label: 'Momen / kalender', type: 'select', options: MOMEN },
+        { id: 'platform', label: 'Platform', type: 'select', options: ['Campuran', 'Instagram', 'TikTok', 'Threads', 'YouTube', 'LinkedIn'] },
+        { id: 'jumlah', label: 'Jumlah ide', type: 'select', options: ['5', '10', '15'], value: '10' },
+        { id: 'catatan', label: 'Catatan tambahan (opsional)', type: 'textarea', full: true, placeholder: 'Contoh: minggu ini crew menemukan banyak sachet kopi di Cikapundung.' }
+      ],
+      prompt: v => `Buat ${v.jumlah} ide konten untuk River Cleanup Indonesia.
+Pilar: ${v.pilar}. Audiens: ${v.audiens}. Momen: ${v.momen}. Platform: ${v.platform}.${v.catatan ? '\nCatatan: ' + v.catatan : ''}
+
+Untuk setiap ide tulis:
+### [nomor]. [Judul ide]
+- **Pilar:** nama pilar
+- **Format:** (Reels / Carousel / Thread / Video panjang / dll.) + platform
+- **Hook pembuka:** satu kalimat (boleh pakai kalimat asli audiens)
+- **Isi singkat:** 2–3 kalimat
+- **Pain yang dijawab:** masalah audiens yang disentuh
+- **Ajakan kecil:** satu aksi konkret yang bisa dilakukan minggu ini
+Hindari format "video cleanup dramatis sebelum-sesudah" sebagai inti; cleanup hanya boleh jadi hook visual.`
+    },
+    {
+      id: 'script', ico: '🎬', judul: 'Script Video',
+      desc: 'Naskah video siap rekam: hook, isi, ajakan, beserta arahan visual.',
+      fields: [
+        { id: 'topik', label: 'Topik / judul video', type: 'text', required: true, full: true, placeholder: 'Contoh: Kami ikuti 1 bungkus saset dari warung sampai Citarum' },
+        { id: 'pilar', label: 'Pilar konten', type: 'select', options: PILAR_RC.slice(1) },
+        { id: 'durasi', label: 'Durasi', type: 'select', options: ['15–30 detik (Reels/TikTok)', '30–60 detik (Reels/TikTok)', '3–5 menit (YouTube)', '8–12 menit (YouTube)'] },
+        { id: 'gaya', label: 'Gaya video', type: 'select', options: ['Jejak sampah (ikuti perjalanan sampah)', 'Kuis "Masuk Mana?"', 'Vlog lapangan crew harian', 'Talking head (bicara ke kamera)', 'Voice over dokumenter', 'Wawancara warga/anak/guru', 'Infografik angka dengan teks di layar'] },
+        { id: 'poin', label: 'Poin / data yang wajib dibahas (opsional)', type: 'textarea', full: true, placeholder: 'Contoh: 312 kg sampah, 60% plastik saset, 85 relawan.' }
+      ],
+      prompt: v => `Tulis naskah video "${v.topik}". Pilar: ${v.pilar}. Durasi: ${v.durasi}. Gaya: ${v.gaya}.${v.poin ? '\nPoin wajib: ' + v.poin : ''}
+
+Susun sebagai tabel: | Waktu | Ucapan / Voice over | Visual / Shot | Teks di layar |
+Bagian: HOOK (3 detik pertama), ISI, AJAKAN (satu aksi kecil yang konkret: mulai pilah, setor ke bank sampah, daftar Sekolah Sungai Sabtu, ikut aksi, atau follow).
+Bahasa lisan yang natural, bukan kalimat baku. Tutup dengan pesan "Cegah dari Hulu" secara halus, bukan slogan kaku.
+Setelah tabel, tulis:
+### Caption
+### Hashtag
+### Tips rekam di lapangan (3 poin singkat)`
+    },
+    {
+      id: 'relawan', ico: '📣', judul: 'Ajakan Relawan / Info Aksi',
+      desc: 'Paket pengumuman aksi: teks poster, caption, broadcast, dan pengingat.',
+      fields: [
+        { id: 'aksi', label: 'Nama aksi / program', type: 'text', required: true, placeholder: 'Contoh: River Cleanup Day — Sungai Ciroyom' },
+        { id: 'waktu', label: 'Hari, tanggal & jam', type: 'text', placeholder: 'Sabtu, 17 Okt 2026, 07.00–10.00' },
+        { id: 'lokasi', label: 'Lokasi / titik kumpul', type: 'text' },
+        { id: 'kuota', label: 'Kuota peserta', type: 'text', placeholder: '50 orang' },
+        { id: 'bawa', label: 'Yang perlu dibawa / disiapkan', type: 'textarea', placeholder: 'Sepatu boot, tumbler, baju ganti...' },
+        { id: 'link', label: 'Link pendaftaran / kontak', type: 'text' },
+        { id: 'catatan', label: 'Info lain (opsional)', type: 'textarea', full: true, placeholder: 'Mitra, fasilitas, aman untuk keluarga/anak?, dress code...' }
+      ],
+      prompt: v => `Buat paket pengumuman aksi:
+Nama aksi: ${v.aksi}
+Waktu: ${v.waktu || '[waktu]'}
+Lokasi: ${v.lokasi || '[lokasi]'}
+Kuota: ${v.kuota || '[kuota]'}
+Yang dibawa: ${v.bawa || '[perlengkapan]'}
+Pendaftaran: ${v.link || '[link daftar]'}
+${v.catatan ? 'Info lain: ' + v.catatan : ''}
+
+Jawab keraguan yang biasa membuat orang menunda: jadwal, lokasi jauh, takut kotor/bahaya, "nanti saja". Tunjukkan bahwa aksi ini aman, seru, dan berdampak.
+Hasilkan:
+### Teks Poster (judul besar, subjudul, 3–5 poin info)
+### Caption Instagram
+### Script TikTok/Reels 15 detik (gaya "Pertama kali ikut cleanup? Ini yang terjadi")
+### Thread Threads (3–4 post)
+### Pesan WhatsApp Broadcast
+### Pengingat H-1 untuk peserta terdaftar (WhatsApp)
+### Ajakan "langkah berikutnya" setelah aksi (mis. mulai pilah di rumah / setor ke bank sampah)`
+    },
+    {
+      id: 'laporan', ico: '📊', judul: 'Laporan Aksi & Angka Bulan Ini',
+      desc: 'Ubah data aksi atau data bulanan menjadi konten dampak dan laporan untuk mitra.',
+      fields: [
+        { id: 'aksi', label: 'Aksi / periode & lokasi', type: 'text', required: true, full: true, placeholder: 'Contoh: Data Oktober 2026 — 12 titik anak sungai Citarum' },
+        { id: 'tanggal', label: 'Tanggal', type: 'text' },
+        { id: 'relawan', label: 'Jumlah relawan / warrior', type: 'text' },
+        { id: 'berat', label: 'Total sampah (kg / karung)', type: 'text' },
+        { id: 'mitra', label: 'Mitra / sponsor yang terlibat', type: 'text' },
+        { id: 'rincian', label: 'Rincian jenis sampah (opsional)', type: 'textarea', placeholder: 'Plastik saset 40%, styrofoam 15%, popok 10%...' },
+        { id: 'merek', label: 'Merek paling sering ditemukan / brand audit (opsional)', type: 'textarea', placeholder: 'Merek A (120 item), Merek B (85 item)...' },
+        { id: 'temuan', label: 'Cerita / temuan menarik di lapangan', type: 'textarea', full: true, placeholder: 'Contoh: ditemukan kasur, warga ikut turun ke sungai...' }
+      ],
+      prompt: v => `Buat konten laporan dampak:
+Aksi/periode & lokasi: ${v.aksi}
+Tanggal: ${v.tanggal || '[tanggal]'}
+Relawan: ${v.relawan || '[jumlah relawan]'}
+Total sampah: ${v.berat || '[total kg]'}
+Mitra: ${v.mitra || '-'}
+Rincian jenis: ${v.rincian || '-'}
+Merek/brand audit: ${v.merek || '-'}
+Temuan: ${v.temuan || '-'}
+
+Hasilkan:
+### Carousel Instagram "Angka Bulan Ini" (teks per slide, 6–8 slide, angka ditonjolkan, slide terakhir = satu aksi pencegahan di rumah)
+### Caption Instagram
+### Thread Threads / X
+### Ringkasan Laporan untuk Mitra & Sponsor (formal, 2–3 paragraf + poin angka, tekankan dampak pencegahan)
+### Pesan Terima Kasih untuk Relawan (WhatsApp)
+Pakai HANYA angka yang diberikan. Bila ada data merek, bingkai sebagai tanggung jawab bersama produsen, bukan menyerang merek atau menyalahkan warga.`
+    },
+    { group: 'Kembangkan & Sebarkan' },
+    {
+      id: 'repurpose', ico: '🔁', judul: 'Satu Materi, Banyak Platform',
+      desc: 'Ubah satu naskah, artikel, atau catatan menjadi konten untuk beberapa platform.',
+      fields: [
+        { id: 'materi', label: 'Materi asal', type: 'textarea', required: true, full: true, placeholder: 'Tempel naskah, artikel, atau catatan di sini...' },
+        { id: 'target', label: 'Ubah menjadi', type: 'checks', full: true, options: ['Carousel Instagram', 'Caption Instagram', 'Script TikTok', 'Thread Threads', 'Thread X', 'Post LinkedIn', 'Pesan WhatsApp', 'Newsletter / Email'], value: ['Carousel Instagram', 'Script TikTok', 'Thread Threads'] }
+      ],
+      prompt: v => `Dari materi berikut:
+"""${v.materi}"""
+
+Adaptasikan menjadi: ${v.target.join(', ')}.
+Buat satu bagian "### [nama format]" untuk tiap format, dengan gaya khas platform tersebut (LinkedIn lebih profesional untuk CSR/mitra, TikTok bahasa lisan, Threads singkat dan ngobrol, WhatsApp cocok untuk grup RW/sekolah).`
+    },
+    {
+      id: 'hook', ico: '🪝', judul: 'Hook Pembuka',
+      desc: 'Kalimat pembuka 3 detik pertama yang bikin orang berhenti scroll.',
+      fields: [
+        { id: 'topik', label: 'Topik konten', type: 'text', required: true, full: true, placeholder: 'Contoh: sampah saset dari dapur kita berakhir di sungai' },
+        { id: 'platform', label: 'Platform', type: 'select', options: ['TikTok / Reels', 'YouTube', 'Threads (kalimat pertama)'] }
+      ],
+      prompt: v => `Buat 12 hook pembuka untuk topik "${v.topik}" (platform: ${v.platform}).
+Kelompokkan:
+### Ke mana sampahmu pergi? (3)
+### Kuis "Masuk mana?" (2)
+### Temuan sungai / rasa penasaran (2)
+### Kalimat asli warga (2) — mulai dari keluhan seperti "percuma dipilah" atau "TPS penuh lagi"
+### Anak-anak & sekolah (1)
+### Angka / data (2)
+Tiap hook maks. 15 kata, tambahkan saran visual singkat dalam [ ]. Jangan menakut-nakuti, menyalahkan penonton, atau meniru gaya cleanup dramatis.`
+    },
+    {
+      id: 'judul', ico: '🖼️', judul: 'Judul & Thumbnail',
+      desc: 'Variasi judul dan konsep visual thumbnail/cover.',
+      fields: [
+        { id: 'ringkasan', label: 'Ringkasan isi video', type: 'textarea', required: true, full: true }
+      ],
+      prompt: v => `Ringkasan video:
+"""${v.ringkasan}"""
+
+### 6 Variasi Judul (bikin penasaran tapi jujur, tidak clickbait palsu; utamakan sudut pencegahan & jejak sampah)
+### 3 Konsep Thumbnail / Cover (objek utama, teks besar maks. 4 kata, warna, ekspresi)
+### Rekomendasi (judul + thumbnail mana yang paling kuat dan kenapa)`
+    },
+    {
+      id: 'seo', ico: '🔎', judul: 'SEO YouTube',
+      desc: 'Judul, deskripsi, chapter, tag, dan hashtag YouTube.',
+      fields: [
+        { id: 'naskah', label: 'Naskah / catatan video', type: 'textarea', required: true, full: true }
+      ],
+      prompt: v => `Dari naskah/catatan video berikut:
+"""${v.naskah}"""
+
+Buat paket YouTube:
+### Judul (dioptimasi pencarian, maks. 70 karakter) — beri 3 opsi
+### Deskripsi (paragraf pembuka berisi kata kunci lokal seperti "cara pilah sampah", "bank sampah Bandung", "volunteer bersih sungai Bandung"; ajakan ikut aksi/daftar sekolah; placeholder link sosial media & pendaftaran)
+### Chapter / Timestamp perkiraan
+### 15 Tag
+### 5 Hashtag`
+    },
+    {
+      id: 'mitra', ico: '🤝', judul: 'Pesan Kemitraan',
+      desc: 'Email atau pesan untuk perusahaan, sekolah, pemerintah, atau media.',
+      fields: [
+        { id: 'sasaran', label: 'Paket / sasaran', type: 'select', options: ['Perusahaan — paket CSR employee cleanup + edukasi + laporan data', 'Perusahaan/yayasan — sponsor infrastruktur (trash barrier, ecobin, sorting station)', 'Perusahaan — brand audit / EPR', 'Sekolah — Plastic Clever Schools / Sekolah Sungai', 'Pemkot / DLH / Kelurahan', 'Kampus / riset', 'Media'] },
+        { id: 'nama', label: 'Nama lembaga sasaran', type: 'text' },
+        { id: 'ajakan', label: 'Bentuk kerja sama yang diajak', type: 'text', required: true, full: true, placeholder: 'Contoh: aksi bersih sungai 50 karyawan + edukasi pilah + laporan data' },
+        { id: 'detail', label: 'Detail pendukung (opsional)', type: 'textarea', full: true, placeholder: 'Data aksi sebelumnya, kontak PIC, timeline...' }
+      ],
+      prompt: v => `Tulis pesan kemitraan. Paket/sasaran: ${v.sasaran}${v.nama ? ' (' + v.nama + ')' : ''}.
+Ajakan: ${v.ajakan}
+${v.detail ? 'Detail: ' + v.detail : ''}
+
+Pakai sudut "CSR yang mencegah, bukan cuma membersihkan": dampak terukur, laporan data, kredibel (sejak 2019, jaringan global River Cleanup), aman dari tuduhan greenwashing. Gunakan fakta RCI yang sudah diketahui.
+Hasilkan:
+### Email / Surat Singkat (subjek + isi, profesional, 200–300 kata)
+### Pesan WhatsApp Pembuka (singkat, sopan)
+### Poin Manfaat untuk Mitra (5 poin)
+### Pesan Follow-up (jika belum dibalas 1 minggu)`
+    }
+  ],
+
+  bs: [
+    {
+      id: 'niche', ico: '🧭', judul: 'Cari Ciri Khas',
+      desc: 'Mulai di sini: temukan ciri khas (niche) bank sampah kalian.',
+      fields: [
+        { id: 'sungai', label: 'Sungai / tempat dekat bank sampah', type: 'text', placeholder: 'Contoh: anak sungai Cikapundung, dekat pasar' },
+        { id: 'pengurus', label: 'Siapa saja pengurusnya?', type: 'text', placeholder: 'Contoh: ibu-ibu PKK dan karang taruna' },
+        { id: 'kelebihan', label: 'Apa yang sudah jalan / kelebihan kalian?', type: 'textarea', placeholder: 'Contoh: rutin timbang tiap Sabtu, ada 40 nasabah, anak-anak suka ikut' },
+        { id: 'kendala', label: 'Apa kendala terbesar?', type: 'textarea', placeholder: 'Contoh: warga belum percaya, nasabah jarang setor' }
+      ],
+      prompt: v => `Bantu bank sampah ini menemukan ciri khas (niche) yang selaras dengan gerakan "Cegah dari Hulu" River Cleanup Indonesia.
+Sungai/tempat terdekat: ${v.sungai || '-'}
+Pengurus: ${v.pengurus || '-'}
+Kelebihan: ${v.kelebihan || '-'}
+Kendala: ${v.kendala || '-'}
+
+Berikan 3 pilihan ciri khas. Untuk setiap pilihan:
+### [nomor]. [Nama ciri khas]
+- **Tagline:** maks. 7 kata
+- **Cocok untuk siapa:** sasaran utama
+- **Masalah warga yang dijawab:**
+- **Kenapa beda dari bank sampah lain:**
+- **3 contoh postingan:** (sebut platform: Instagram / TikTok / Threads)
+Lalu:
+### Rekomendasi
+Pilihan terbaik untuk mulai dan alasannya (2–3 kalimat), plus 1 kalimat perkenalan bank sampah yang bisa dipakai di bio Instagram/TikTok.
+Bahasa sangat sederhana.`
+    },
+    {
+      id: 'ide', ico: '💡', judul: 'Ide Postingan',
+      desc: 'Bingung mau posting apa? Pilih tujuannya, AI kasih idenya.',
+      fields: [
+        { id: 'tujuan', label: 'Tujuan', type: 'select', options: ['Cari nasabah baru', 'Kenalkan bank sampah ke warga Bandung', 'Ajari cara pilah sampah', 'Bikin warga percaya (pilah tidak sia-sia)', 'Info harga & jadwal'] },
+        { id: 'pilar', label: 'Tema', type: 'select', options: PILAR_BS },
+        { id: 'jumlah', label: 'Jumlah ide', type: 'select', options: ['5', '10'], value: '5' }
+      ],
+      prompt: v => `Beri ${v.jumlah} ide postingan untuk bank sampah ini. Tujuan: ${v.tujuan}. Tema: ${v.pilar}.
+Untuk setiap ide:
+### [nomor]. [Judul ide]
+- **Cocok di:** Instagram / TikTok / Threads
+- **Kalimat pembuka:** satu kalimat
+- **Isinya:** 1–2 kalimat sederhana
+- **Cara bikinnya:** apa yang perlu difoto/direkam pakai HP`
+    },
+    {
+      id: 'posting', ico: '✍️', judul: 'Bikin Postingan',
+      desc: 'Tulis topiknya, pilih platform, langsung jadi.',
+      fields: [
+        { id: 'topik', label: 'Mau bahas apa?', type: 'textarea', required: true, full: true, placeholder: 'Contoh: cara memilah botol plastik sebelum disetor' },
+        { id: 'platform', label: 'Untuk', type: 'radios', full: true, options: ['Instagram', 'TikTok', 'Threads'], value: 'Instagram' }
+      ],
+      prompt: v => {
+        const format = {
+          'Instagram': '### Teks Slide Carousel (4–6 slide, kalimat pendek)\n### Caption (dengan ajakan di akhir)\n### Hashtag',
+          'TikTok': '### Script 30 detik (tabel: | Detik | Ucapan | Yang direkam |)\n### Teks di layar\n### Caption singkat + hashtag',
+          'Threads': '### Thread (3–5 post pendek, gaya ngobrol, post terakhir berisi ajakan)'
+        }[v.platform];
+        return `Buat postingan ${v.platform} tentang: ${v.topik}\n\nHasilkan:\n${format}`;
+      }
+    },
+    {
+      id: 'nasabah', ico: '🙋', judul: 'Ajak Jadi Nasabah',
+      desc: 'Konten ajakan supaya warga mau menabung sampah.',
+      fields: [
+        { id: 'sasaran', label: 'Siapa yang diajak?', type: 'select', options: ['Tetangga sekitar', 'Ibu-ibu PKK & pengajian', 'Pemilik warung & kios', 'Anak kos & pekerja muda', 'Warga Bandung yang mencari bank sampah terdekat', 'Relawan & follower River Cleanup'] },
+        { id: 'alasan', label: 'Alasan utama yang ditonjolkan', type: 'select', options: ['Sampah jadi tabungan ("nggak rugi")', 'Pilahanmu tidak sia-sia — kami tunjukkan ke mana perginya', 'Sampah tidak menumpuk saat TPS penuh', 'Sungai depan kampung lebih bersih, tidak banjir', 'Caranya gampang', 'Anak belajar kebiasaan baik'] }
+      ],
+      prompt: v => `Buat konten ajakan menjadi nasabah bank sampah.
+Sasaran: ${v.sasaran}. Alasan utama: ${v.alasan}.
+Jawab keraguan yang paling mungkin dari sasaran ini (mis. ribet, laku berapa, percuma). Sertakan langkah daftar/setor yang sederhana (pakai [isi ...] untuk info yang belum diketahui).
+
+Hasilkan:
+### Instagram (teks 4 slide + caption)
+### TikTok (script 20–30 detik, tabel: | Detik | Ucapan | Yang direkam |)
+### Threads (3 post)`
+    },
+    {
+      id: 'kabar', ico: '📢', judul: 'Kabar Bank Sampah',
+      desc: 'Hasil timbang, harga, jadwal, ke mana sampah pergi, atau terima kasih.',
+      fields: [
+        { id: 'jenis', label: 'Jenis kabar', type: 'select', options: ['Hasil penimbangan', 'Daftar harga sampah', 'Jadwal & lokasi setor', 'Ke mana sampah setoran kita pergi', 'Darurat TPS: titip pilahan ke bank sampah', 'Terima kasih untuk nasabah', 'Nasabah baru bergabung'] },
+        { id: 'data', label: 'Datanya', type: 'textarea', required: true, full: true, placeholder: 'Contoh: Sabtu kemarin 23 nasabah setor, total 148 kg, terbanyak kardus 60 kg...' }
+      ],
+      prompt: v => `Buat kabar bank sampah. Jenis: ${v.jenis}.
+Data: ${v.data}
+Pakai HANYA angka yang diberikan. Buat terasa hangat, jadi bukti bahwa memilah tidak sia-sia, dan bikin warga lain ingin ikut.
+
+Hasilkan:
+### Instagram (teks 1–3 slide + caption)
+### TikTok (script 15–20 detik)
+### Threads (1–2 post)`
+    }
+  ]
+};
+
+const INFO_BS = [
+  { id: 'nama', label: 'Nama bank sampah', placeholder: 'Bank Sampah ...' },
+  { id: 'lokasi', label: 'Lokasi (RW / kelurahan)', placeholder: 'RW 05, Kel. ...' },
+  { id: 'sungai', label: 'Sungai terdekat', placeholder: 'Anak sungai ...' },
+  { id: 'jadwal', label: 'Jadwal timbang', placeholder: 'Sabtu, 08.00–11.00' },
+  { id: 'kontak', label: 'Kontak / akun IG', placeholder: '08xx / @banksampah...' },
+  { id: 'cirikhas', label: 'Ciri khas (kalau sudah dipilih)', placeholder: 'Hasil dari menu "Cari Ciri Khas"' },
+  { id: 'harga', label: 'Sampah yang diterima & harganya', type: 'textarea', placeholder: 'Kardus Rp.../kg, botol PET Rp.../kg...' }
+];
+
+/* =====================================================================
+   PENYIMPANAN (localStorage, aman kalau tidak tersedia)
+   ===================================================================== */
+const simpan = {
+  get(k, def) { try { const v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); } catch { return def; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+
+let mode = simpan.get('sk_mode', 'rc');
+let fiturAktif = null;
+
+/* =====================================================================
+   TAMPILAN
+   ===================================================================== */
+function gantiMode(m) {
+  mode = m;
+  simpan.set('sk_mode', m);
+  document.body.className = 'mode-' + m;
+  document.getElementById('logo').textContent = KONTEKS[m].logo;
+  document.getElementById('brand-sub').textContent = KONTEKS[m].nama;
+  document.querySelectorAll('.switch button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  const pertama = FITUR[m].find(f => f.id);
+  bukaFitur(pertama.id);
+}
+
+function renderMenu() {
+  const nav = document.getElementById('menu');
+  const items = FITUR[mode].map(f => f.group
+    ? `<div class="group">${f.group}</div>`
+    : `<button class="${f.id === fiturAktif ? 'on' : ''}" onclick="bukaFitur('${f.id}')"><span class="ico">${f.ico}</span>${f.judul}</button>`);
+  items.push(`<div class="group">Lainnya</div>`);
+  items.push(`<button class="${fiturAktif === 'riwayat' ? 'on' : ''}" onclick="bukaFitur('riwayat')"><span class="ico">🗂️</span>Riwayat</button>`);
+  nav.innerHTML = items.join('');
+}
+
+function bukaFitur(id) {
+  fiturAktif = id;
+  renderMenu();
+  const panel = document.getElementById('panel');
+  if (id === 'riwayat') { panel.innerHTML = renderRiwayat(); return; }
+  const f = FITUR[mode].find(x => x.id === id);
+  panel.innerHTML = `
+    ${mode === 'bs' ? renderInfoBS() : ''}
+    <div class="card">
+      <h2>${f.ico} ${f.judul}</h2>
+      <p class="desc">${f.desc}</p>
+      <div class="grid">${f.fields.map(renderField).join('')}</div>
+      <button class="primary" id="btn-go" onclick="jalankan()">✨ Buatkan</button>
+    </div>
+    <div class="card" id="hasil" hidden></div>`;
+  window.scrollTo({ top: 0 });
+}
+
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+function renderField(fd) {
+  const req = fd.required ? ' <span class="req">*</span>' : '';
+  const cls = 'field' + (fd.full ? ' full' : '');
+  const id = 'f-' + fd.id;
+  let input;
+  if (fd.type === 'select') {
+    input = `<select id="${id}">${fd.options.map(o => `<option ${o === fd.value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+  } else if (fd.type === 'textarea') {
+    input = `<textarea id="${id}" rows="3" placeholder="${esc(fd.placeholder)}"></textarea>`;
+  } else if (fd.type === 'checks' || fd.type === 'radios') {
+    const t = fd.type === 'checks' ? 'checkbox' : 'radio';
+    const sel = [].concat(fd.value || []);
+    input = `<div class="${fd.type}">${fd.options.map(o => `<label><input type="${t}" name="${id}" value="${esc(o)}" ${sel.includes(o) ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>`;
+    return `<div class="${cls}"><label>${fd.label}${req}</label>${input}</div>`;
+  } else {
+    input = `<input type="text" id="${id}" placeholder="${esc(fd.placeholder)}">`;
+  }
+  return `<div class="${cls}"><label for="${id}">${fd.label}${req}</label>${input}</div>`;
+}
+
+function renderInfoBS() {
+  const info = simpan.get('sk_info_bs', {});
+  const terisi = INFO_BS.some(x => info[x.id]);
+  return `<details class="info" ${terisi ? '' : 'open'}>
+    <summary>🏠 Info bank sampah kami ${terisi ? '— ' + esc(info.nama || 'tersimpan') : '(opsional, isi sekali saja)'}</summary>
+    <div class="grid">${INFO_BS.map(x => `<div class="field${x.type === 'textarea' ? ' full' : ''}"><label for="i-${x.id}">${x.label}</label>${x.type === 'textarea'
+      ? `<textarea id="i-${x.id}" rows="2" placeholder="${esc(x.placeholder)}" onchange="simpanInfoBS()">${esc(info[x.id])}</textarea>`
+      : `<input id="i-${x.id}" value="${esc(info[x.id])}" placeholder="${esc(x.placeholder)}" onchange="simpanInfoBS()">`}</div>`).join('')}</div>
+  </details>`;
+}
+
+function simpanInfoBS() {
+  const info = {};
+  INFO_BS.forEach(x => { info[x.id] = document.getElementById('i-' + x.id).value.trim(); });
+  simpan.set('sk_info_bs', info);
+  toast('Info bank sampah disimpan');
+}
+
+/* =====================================================================
+   JALANKAN FITUR
+   ===================================================================== */
+function ambilNilai(f) {
+  const v = {};
+  for (const fd of f.fields) {
+    const id = 'f-' + fd.id;
+    if (fd.type === 'checks') v[fd.id] = [...document.querySelectorAll(`input[name="${id}"]:checked`)].map(i => i.value);
+    else if (fd.type === 'radios') v[fd.id] = (document.querySelector(`input[name="${id}"]:checked`) || {}).value || '';
+    else v[fd.id] = document.getElementById(id).value.trim();
+    const kosong = Array.isArray(v[fd.id]) ? !v[fd.id].length : !v[fd.id];
+    if (fd.required && kosong) { toast(`"${fd.label}" wajib diisi`); return null; }
+  }
+  return v;
+}
+
+function konteksSistem() {
+  let teks = KONTEKS[mode].teks;
+  if (mode === 'bs') {
+    const info = simpan.get('sk_info_bs', {});
+    const baris = INFO_BS.filter(x => info[x.id]).map(x => `- ${x.label}: ${info[x.id]}`);
+    if (baris.length) teks += `\n\nINFO BANK SAMPAH INI\n${baris.join('\n')}`;
+  }
+  return teks + '\n' + ATURAN_FORMAT;
+}
+
+async function jalankan() {
+  const f = FITUR[mode].find(x => x.id === fiturAktif);
+  const v = ambilNilai(f);
+  if (!v) return;
+  const btn = document.getElementById('btn-go');
+  const box = document.getElementById('hasil');
+  btn.disabled = true;
+  box.hidden = false;
+  box.innerHTML = '<div class="loading"><span class="spin"></span>Sedang menyiapkan konten...</div>';
+  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  try {
+    const teks = await panggilAI(konteksSistem(), f.prompt(v));
+    tampilkanHasil(box, f.judul, teks);
+    simpanRiwayat(f, v, teks);
+  } catch (e) {
+    box.innerHTML = `<p class="err">⚠️ ${esc(e.message)}</p>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function tampilkanHasil(box, judul, teks) {
+  box.innerHTML = `
+    <div class="result-head">
+      <h3>Hasil: ${esc(judul)}</h3>
+      <button class="ghost" onclick="salin(this)">📋 Salin</button>
+    </div>
+    <div class="out">${markdown(teks)}</div>`;
+  box.querySelector('button').dataset.teks = teks;
+}
+
+function salin(btn) {
+  const teks = btn.dataset.teks;
+  const ok = () => toast('Tersalin ✓');
+  if (navigator.clipboard) navigator.clipboard.writeText(teks).then(ok, () => salinCadangan(teks, ok));
+  else salinCadangan(teks, ok);
+}
+function salinCadangan(teks, ok) {
+  const ta = document.createElement('textarea');
+  ta.value = teks; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); ok(); } catch {}
+  ta.remove();
+}
+
+/* =====================================================================
+   PANGGIL GEMINI
+   ===================================================================== */
+const MODEL_DEFAULT = ['gemini-flash-latest', 'gemini-2.5-flash'];
+
+async function panggilAI(sistem, prompt) {
+  const key = simpan.get('sk_key', '');
+  const custom = simpan.get('sk_model', '');
+  const models = custom ? [custom] : MODEL_DEFAULT;
+  const body = JSON.stringify({
+    systemInstruction: { parts: [{ text: sistem }] },
+    contents: [{ role: 'user', parts: [{ text: prompt }] }]
+  });
+
+  let pesanTerakhir = '';
+  for (const model of models) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+    for (let coba = 0; coba < 3; coba++) {
+      let res;
+      try {
+        res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+      } catch {
+        throw new Error('Tidak bisa terhubung ke internet / Gemini. Cek koneksi lalu coba lagi.');
+      }
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        const teks = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
+        if (teks) return teks;
+        throw new Error('AI tidak memberi jawaban. Coba ubah isian lalu ulangi.');
+      }
+      pesanTerakhir = data.error?.message || `HTTP ${res.status}`;
+      if (res.status === 429 || res.status >= 500) { await new Promise(r => setTimeout(r, 1500 * (coba + 1))); continue; }
+      if (res.status === 404) break; // model tidak ada, coba model berikutnya
+      if (res.status === 400 || res.status === 401 || res.status === 403) {
+        if (!key) throw new Error('API key belum diisi. Klik ⚙️ di kanan atas untuk mengisinya.');
+        throw new Error('API key ditolak: ' + pesanTerakhir);
+      }
+      throw new Error(pesanTerakhir);
+    }
+  }
+  throw new Error('Gagal memanggil AI: ' + pesanTerakhir + ' (coba isi nama model di ⚙️ Pengaturan)');
+}
+
+/* =====================================================================
+   RIWAYAT
+   ===================================================================== */
+function simpanRiwayat(f, v, teks) {
+  const semua = simpan.get('sk_riwayat_' + mode, []);
+  const ringkas = Object.values(v).flat().filter(Boolean).join(' · ').slice(0, 80);
+  semua.unshift({ judul: f.judul, ico: f.ico, ringkas, teks, waktu: new Date().toISOString() });
+  simpan.set('sk_riwayat_' + mode, semua.slice(0, 30));
+}
+
+function renderRiwayat() {
+  const semua = simpan.get('sk_riwayat_' + mode, []);
+  const daftar = semua.map((r, i) => `
+    <details class="hist-item">
+      <summary><span>${r.ico} <b>${esc(r.judul)}</b> — ${esc(r.ringkas)}</span><span>${new Date(r.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</span></summary>
+      <div class="hist-body">
+        <div class="result-head"><span></span><button class="ghost" data-i="${i}" onclick="salinRiwayat(this)">📋 Salin</button></div>
+        <div class="out">${markdown(r.teks)}</div>
+      </div>
+    </details>`).join('');
+  return `<div class="card">
+    <div class="result-head"><h2>🗂️ Riwayat ${esc(KONTEKS[mode].nama)}</h2>
+      <span>${semua.length ? '<button class="ghost" onclick="eksporRiwayat()">⬇️ Unduh</button> <button class="ghost danger" onclick="hapusRiwayat()">Hapus</button>' : ''}</span></div>
+    <p class="desc">30 hasil terakhir tersimpan di browser ini.</p>
+    ${daftar || '<div class="empty">Belum ada hasil. Coba salah satu fitur dulu.</div>'}
+  </div>`;
+}
+
+function salinRiwayat(btn) {
+  btn.dataset.teks = simpan.get('sk_riwayat_' + mode, [])[btn.dataset.i].teks;
+  salin(btn);
+}
+
+function eksporRiwayat() {
+  const semua = simpan.get('sk_riwayat_' + mode, []);
+  const isi = semua.map(r => `# ${r.judul} — ${new Date(r.waktu).toLocaleString('id-ID')}\n${r.ringkas}\n\n${r.teks}`).join('\n\n---\n\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([isi], { type: 'text/markdown' }));
+  a.download = `riwayat-${mode === 'rc' ? 'river-cleanup' : 'bank-sampah'}-${new Date().toISOString().slice(0, 10)}.md`;
+  a.click();
+}
+
+function hapusRiwayat() {
+  if (!confirm('Hapus semua riwayat ' + KONTEKS[mode].nama + '?')) return;
+  simpan.set('sk_riwayat_' + mode, []);
+  bukaFitur('riwayat');
+}
+
+/* =====================================================================
+   MARKDOWN SEDERHANA → HTML (aman: semua teks di-escape dulu)
+   ===================================================================== */
+function inline(s) {
+  return esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<i>$2</i>');
+}
+
+function markdown(md) {
+  const baris = md.replace(/\r/g, '').split('\n');
+  let html = '', list = null, i = 0;
+  const tutupList = () => { if (list) { html += `</${list}>`; list = null; } };
+  while (i < baris.length) {
+    const b = baris[i];
+    if (/^\s*\|.*\|\s*$/.test(b)) {
+      tutupList();
+      const rows = [];
+      while (i < baris.length && /^\s*\|.*\|\s*$/.test(baris[i])) { rows.push(baris[i]); i++; }
+      const sel = r => r.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+      const isi = rows.filter(r => !/^\s*\|[\s:|-]+\|\s*$/.test(r)).map(sel);
+      if (isi.length) {
+        html += '<div class="tbl"><table><tr>' + isi[0].map(c => `<th>${inline(c)}</th>`).join('') + '</tr>' +
+          isi.slice(1).map(r => '<tr>' + r.map(c => `<td>${inline(c)}</td>`).join('') + '</tr>').join('') + '</table></div>';
+      }
+      continue;
+    }
+    let m;
+    if ((m = b.match(/^\s*#{1,6}\s+(.*)/))) { tutupList(); html += `<h3>${inline(m[1])}</h3>`; }
+    else if (/^\s*(-{3,}|\*{3,})\s*$/.test(b)) { tutupList(); html += '<hr>'; }
+    else if ((m = b.match(/^\s*[-*•]\s+(.*)/))) { if (list !== 'ul') { tutupList(); html += '<ul>'; list = 'ul'; } html += `<li>${inline(m[1])}</li>`; }
+    else if ((m = b.match(/^\s*\d+[.)]\s+(.*)/))) { if (list !== 'ol') { tutupList(); html += '<ol>'; list = 'ol'; } html += `<li>${inline(m[1])}</li>`; }
+    else if (!b.trim()) { tutupList(); }
+    else { tutupList(); html += `<p>${inline(b)}</p>`; }
+    i++;
+  }
+  tutupList();
+  return html;
+}
+
+/* =====================================================================
+   PENGATURAN & TOAST
+   ===================================================================== */
+function bukaPengaturan() {
+  document.getElementById('set-key').value = simpan.get('sk_key', '');
+  document.getElementById('set-model').value = simpan.get('sk_model', '');
+  document.getElementById('modal').classList.add('show');
+}
+function tutupPengaturan() { document.getElementById('modal').classList.remove('show'); }
+function simpanPengaturan() {
+  simpan.set('sk_key', document.getElementById('set-key').value.trim());
+  simpan.set('sk_model', document.getElementById('set-model').value.trim());
+  tutupPengaturan();
+  toast('Pengaturan disimpan');
+}
+
+let toastTimer;
+function toast(pesan) {
+  const t = document.getElementById('toast');
+  t.textContent = pesan;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+gantiMode(mode);
+if (!simpan.get('sk_key', '')) setTimeout(() => toast('Tip: isi Gemini API key di ⚙️ dulu'), 600);
+</script>
+</body>
+</html>
+
+```
