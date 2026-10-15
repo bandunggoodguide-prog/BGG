@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Konten Komunitas</title>
+<style>
+  :root {
+    --bg: #f4f7f6;
+    --card: #ffffff;
+    --text: #1d2a2a;
+    --muted: #5f6f6f;
+    --line: #dfe7e5;
+    --accent: #0b6fa4;
+    --accent-soft: #e3f1f9;
+    --accent-text: #ffffff;
+    --danger: #b3261e;
+    --radius: 14px;
+  }
+  body.mode-bs { --accent: #2e7d32; --accent-soft: #e6f4e7; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+
+  /* Header */
+  .top { position: sticky; top: 0; z-index: 10; background: var(--card); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; padding: 10px 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .logo { width: 38px; height: 38px; border-radius: 10px; background: var(--accent); color: var(--accent-text); display: grid; place-items: center; font-size: 20px; flex-shrink: 0; }
+  .brand h1 { font-size: 16px; margin: 0; white-space: nowrap; }
+  .brand p { font-size: 12px; margin: 0; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .switch { margin-left: auto; display: flex; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+  .switch button { border: 0; background: none; padding: 6px 12px; border-radius: 999px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+  .switch button.on { background: var(--accent); color: var(--accent-text); }
+  .icon-btn { border: 1px solid var(--line); background: var(--card); width: 38px; height: 38px; border-radius: 10px; cursor: pointer; font-size: 17px; flex-shrink: 0; }
+
+  /* Layout */
+  .wrap { display: flex; max-width: 1180px; margin: 0 auto; }
+  nav { width: 250px; flex-shrink: 0; padding: 18px 12px; position: sticky; top: 59px; align-self: flex-start; }
+  nav .group { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 10px 6px; }
+  nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0; background: none; padding: 9px 10px; border-radius: 10px; cursor: pointer; font-size: 14px; }
+  nav button:hover { background: var(--accent-soft); }
+  nav button.on { background: var(--accent); color: var(--accent-text); font-weight: 600; }
+  nav .ico { width: 22px; text-align: center; }
+  main { flex: 1; min-width: 0; padding: 18px 16px 60px; }
+
+  /* Cards & forms */
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+  .card h2 { font-size: 18px; margin: 0 0 4px; }
+  .card .desc { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: 13px; font-weight: 600; }
+  .field label .req { color: var(--danger); }
+  .field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; background: #fbfcfc; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; background: #fff; }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px; }
+  .checks label, .radios label { display: flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; background: #fbfcfc; }
+  .checks input, .radios input { accent-color: var(--accent); }
+  .radios { display: flex; flex-wrap: wrap; gap: 8px; }
+  .primary { width: 100%; margin-top: 14px; border: 0; background: var(--accent); color: var(--accent-text); padding: 12px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; }
+  .primary:disabled { opacity: .6; cursor: wait; }
+  .ghost { border: 1px solid var(--line); background: var(--card); padding: 6px 12px; border-radius: 9px; font-size: 13px; cursor: pointer; }
+  .ghost.danger { color: var(--danger); }
+  details.info { background: var(--accent-soft); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; }
+  details.info summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+  details.info .grid { margin-top: 12px; }
+
+  /* Result */
+  .result-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+  .result-head h3 { margin: 0; font-size: 15px; }
+  .out { font-size: 14.5px; overflow-wrap: anywhere; }
+  .out h1, .out h2, .out h3, .out h4 { font-size: 15.5px; margin: 18px 0 6px; color: var(--accent); }
+  .out p { margin: 6px 0; }
+  .out ul, .out ol { margin: 6px 0; padding-left: 22px; }
+  .out hr { border: 0; border-top: 1px dashed var(--line); margin: 16px 0; }
+  .out .tbl { overflow-x: auto; }
+  .out table { border-collapse: collapse; width: 100%; font-size: 13.5px; margin: 8px 0; }
+  .out th, .out td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+  .out th { background: var(--accent-soft); }
+  .loading { color: var(--muted); display: flex; gap: 8px; align-items: center; }
+  .spin { width: 16px; height: 16px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: s 0.8s linear infinite; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  .err { color: var(--danger); }
+
+  /* History */
+  .hist-item { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; background: var(--card); }
+  .hist-item summary { cursor: pointer; padding: 10px 14px; display: flex; justify-content: space-between; gap: 10px; font-size: 14px; }
+  .hist-item summary span:last-child { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .hist-body { padding: 0 14px 14px; }
+  .empty { color: var(--muted); text-align: center; padding: 30px 0; }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+  .modal.show { display: flex; }
+  .modal .card { width: 100%; max-width: 460px; margin: 0; }
+  .note { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: #1d2a2a; color: #fff; padding: 9px 16px; border-radius: 999px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 60; }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 860px) {
+    .wrap { display: block; }
+    nav { width: auto; position: sticky; top: 59px; z-index: 5; background: var(--bg); padding: 8px 12px; display: flex; gap: 6px; overflow-x: auto; border-bottom: 1px solid var(--line); }
+    nav .group { display: none; }
+    nav button { width: auto; white-space: nowrap; border: 1px solid var(--line); background: var(--card); padding: 7px 12px; font-size: 13px; }
+    main { padding: 14px 16px 60px; }
+    .grid { grid-template-columns: 1fr; }
+    .brand p { display: none; }
+  }
+  @media (max-width: 480px) {
+    .brand h1 { display: none; }
+    .switch button { padding: 6px 10px; font-size: 12.5px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="logo" id="logo">🌊</div>
+    <div>
+      <h1>Studio Konten Komunitas</h1>
+      <p id="brand-sub">River Cleanup Indonesia</p>
+    </div>
+  </div>
+  <div class="switch">
+    <button data-mode="rc" onclick="gantiMode('rc')">🌊 River Cleanup</button>
+    <button data-mode="bs" onclick="gantiMode('bs')">♻️ Bank Sampah</button>
+  </div>
+  <button class="icon-btn" title="Pengaturan" onclick="bukaPengaturan()">⚙️</button>
+</header>
+
+<div class="wrap">
+  <nav id="menu"></nav>
+  <main id="panel"></main>
+</div>
+
+<div class="modal" id="modal" onclick="if (event.target === this) tutupPengaturan()">
+  <div class="card">
+    <h2>⚙️ Pengaturan</h2>
+    <p class="desc">Disimpan hanya di browser ini.</p>
+    <div class="field">
+      <label for="set-key">Gemini API Key</label>
+      <input type="password" id="set-key" placeholder="AIza...">
+      <div class="note">Ambil gratis di aistudio.google.com/apikey. Kalau file ini dibuka di dalam Gemini Canvas, boleh dikosongkan.</div>
+    </div>
+    <div class="field" style="margin-top:12px">
+      <label for="set-model">Model (opsional)</label>
+      <input type="text" id="set-model" placeholder="Kosongkan = otomatis">
+      <div class="note">Isi hanya kalau Google mengganti nama model, misalnya "gemini-2.5-flash".</div>
+    </div>
+    <button class="primary" onclick="simpanPengaturan()">Simpan</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   KONTEKS — ini "otak" AI untuk tiap komunitas.
+   Silakan edit teks di bawah kalau ada info baru (program, data, gaya bahasa).
+   ===================================================================== */
+const KONTEKS = {
+  rc: {
+    nama: 'River Cleanup Indonesia',
+    logo: '🌊',
+    teks: `Kamu adalah tim konten River Cleanup Indonesia.
+
+TENTANG ORGANISASI
+- River Cleanup Indonesia adalah gerakan relawan yang membersihkan sungai dari sampah, berbasis di Bandung, Jawa Barat, dan bekerja di sungai-sungai Bandung Raya (DAS Citarum).
+- Kegiatan: aksi bersih sungai bersama relawan, World Cleanup Day (mis. WCD 2026 di Dago Elos), kolaborasi kampanye seperti Pawai Bebas Plastik Bandung (bersama Greenpeace, YPBB, WALHI Jabar, dll.), kelas edukasi sungai, dan pendampingan Bank Sampah bersama warga.
+- Pesan inti: sampah di sungai berawal dari rumah kita; mencegah lebih penting dari sekadar memungut; aksi kecil yang konsisten membawa perubahan.
+
+AUDIENS
+1. Calon relawan: pelajar SMA, mahasiswa, anak muda Bandung 17–30 tahun yang ingin aksi nyata dan kegiatan seru bareng teman.
+2. Warga bantaran sungai dan pengurus RT/RW.
+3. Mitra dan sponsor: perusahaan (CSR, employee volunteering), sekolah/kampus, komunitas, pemerintah, media.
+4. Publik Bandung yang peduli lingkungan tapi belum bergerak.
+
+PLATFORM: Instagram, TikTok, Threads, YouTube, X, LinkedIn, WhatsApp, email/newsletter.
+
+GAYA BAHASA
+- Bahasa Indonesia santai, hangat, membumi; boleh sapaan Sunda ringan (hayu, mangga, nuhun) bila cocok. Untuk mitra/sponsor: sopan dan profesional.
+- Optimis dan mengajak, bukan menyalahkan atau menakut-nakuti.
+- JANGAN mengarang angka, statistik, nama orang, tanggal, atau kutipan. Pakai data yang diberikan; bila tidak ada, tulis [placeholder] seperti [jumlah kg] atau [link daftar].`
+  },
+  bs: {
+    nama: 'Bank Sampah Warga',
+    logo: '♻️',
+    teks: `Kamu membantu pengurus Bank Sampah Warga di Bandung, yaitu bank sampah yang digerakkan warga setempat bersama River Cleanup Indonesia.
+
+SITUASI
+- Pengurusnya warga biasa, bukan ahli konten. Mereka sedang mencari nasabah dan mencari ciri khas (niche) bank sampahnya.
+- Nasabah utama: warga sekitar (ibu rumah tangga, keluarga, pengurus RT/RW, PKK). Banyak warga Bandung lain belum tahu bank sampah ini ada.
+- Cara kerja umum: warga memilah sampah di rumah (plastik, kertas/kardus, botol, kaleng/logam, dll.), menyetor saat jadwal penimbangan, sampah ditimbang dan dicatat jadi saldo tabungan.
+
+TUJUAN KONTEN: dikenal, dipercaya, menambah nasabah, mengajak warga memilah sampah.
+PLATFORM: hanya Instagram, TikTok, dan Threads.
+
+GAYA BAHASA
+- Sangat sederhana dan ramah, kalimat pendek, seperti tetangga ngobrol. Boleh sapaan Sunda ringan (hayu, mangga, nuhun, punten).
+- Hindari istilah teknis dan istilah marketing.
+- JANGAN mengarang harga, jadwal, alamat, kontak, atau angka. Pakai data yang diberikan; bila tidak ada, tulis [isi ...] seperti [isi jadwal timbang].`
+  }
+};
+
+const ATURAN_FORMAT = `
+ATURAN JAWABAN
+- Bahasa Indonesia. Langsung ke hasil tanpa kalimat pembuka atau penutup basa-basi.
+- Format Markdown sederhana: judul bagian pakai "### ", **tebal**, daftar "- ", tabel "|" bila diminta.
+- Hashtag secukupnya dan relevan (maks. 8), campur hashtag lokal Bandung bila cocok.`;
+
+/* =====================================================================
+   MENU & FITUR
+   Tipe field: text, textarea, select, checks (pilih banyak), radios (pilih satu)
+   ===================================================================== */
+const MOMEN = ['Tidak ada momen khusus', 'Hari Peduli Sampah Nasional (21 Feb)', 'Hari Air Sedunia (22 Mar)', 'Hari Bumi (22 Apr)', 'Hari Lingkungan Hidup Sedunia (5 Jun)', 'Hari Sungai Nasional (27 Jul)', 'World Cleanup Day (Sept)', 'Musim hujan & banjir', 'Ramadan / Lebaran', 'Akhir tahun'];
+
+const FITUR = {
+  rc: [
+    { group: 'Bikin Konten' },
+    {
+      id: 'ide', ico: '💡', judul: 'Ide Konten',
+      desc: 'Dapatkan ide konten yang sesuai tujuan kampanye dan momen lingkungan.',
+      fields: [
+        { id: 'tujuan', label: 'Tujuan konten', type: 'select', options: ['Campuran (semua tujuan)', 'Rekrut relawan baru', 'Edukasi sungai & sampah', 'Pamer dampak / hasil aksi', 'Menarik mitra & sponsor', 'Dukung Bank Sampah Warga'] },
+        { id: 'momen', label: 'Momen / kalender', type: 'select', options: MOMEN },
+        { id: 'platform', label: 'Platform', type: 'select', options: ['Campuran', 'Instagram', 'TikTok', 'Threads', 'YouTube', 'LinkedIn'] },
+        { id: 'jumlah', label: 'Jumlah ide', type: 'select', options: ['5', '10', '15'], value: '10' },
+        { id: 'catatan', label: 'Catatan tambahan (opsional)', type: 'textarea', full: true, placeholder: 'Contoh: minggu depan ada aksi di Cikapundung, mau bahas sampah sachet.' }
+      ],
+      prompt: v => `Buat ${v.jumlah} ide konten untuk River Cleanup Indonesia.
+Tujuan: ${v.tujuan}. Momen: ${v.momen}. Platform: ${v.platform}.${v.catatan ? '\nCatatan: ' + v.catatan : ''}
+
+Untuk setiap ide tulis:
+### [nomor]. [Judul ide]
+- **Format:** (Reels / Carousel / Thread / Video panjang / dll.) + platform
+- **Hook pembuka:** satu kalimat
+- **Isi singkat:** 2–3 kalimat
+- **Kenapa relevan:** alasan untuk audiens yang dituju
+Variasikan format dan sudut pandang (cerita lapangan, edukasi, data, behind the scene, warga, relawan).`
+    },
+    {
+      id: 'script', ico: '🎬', judul: 'Script Video',
+      desc: 'Naskah video siap rekam: hook, isi, ajakan, beserta arahan visual.',
+      fields: [
+        { id: 'topik', label: 'Topik / judul video', type: 'text', required: true, full: true, placeholder: 'Contoh: Sampah apa yang paling banyak kami temukan di sungai?' },
+        { id: 'durasi', label: 'Durasi', type: 'select', options: ['15–30 detik (Reels/TikTok)', '30–60 detik (Reels/TikTok)', '3–5 menit (YouTube)', '8–12 menit (YouTube)'] },
+        { id: 'gaya', label: 'Gaya video', type: 'select', options: ['Vlog lapangan saat aksi', 'Talking head (bicara ke kamera)', 'Voice over dokumenter', 'Wawancara warga/relawan', 'Edukasi dengan teks di layar'] },
+        { id: 'poin', label: 'Poin yang wajib dibahas (opsional)', type: 'textarea', full: true, placeholder: 'Contoh: 312 kg sampah, 60% plastik sachet, 85 relawan.' }
+      ],
+      prompt: v => `Tulis naskah video "${v.topik}". Durasi: ${v.durasi}. Gaya: ${v.gaya}.${v.poin ? '\nPoin wajib: ' + v.poin : ''}
+
+Susun sebagai tabel: | Waktu | Ucapan / Voice over | Visual / Shot | Teks di layar |
+Bagian: HOOK (3 detik pertama), ISI, AJAKAN (CTA: ikut aksi, follow, atau mulai pilah sampah).
+Bahasa lisan yang natural, bukan kalimat baku.
+Setelah tabel, tulis:
+### Caption
+### Hashtag
+### Tips rekam di lapangan (3 poin singkat)`
+    },
+    {
+      id: 'relawan', ico: '📣', judul: 'Ajakan Relawan / Info Aksi',
+      desc: 'Paket pengumuman aksi bersih sungai: caption, teks poster, broadcast, dan pengingat.',
+      fields: [
+        { id: 'aksi', label: 'Nama aksi', type: 'text', required: true, placeholder: 'Contoh: Bersih Sungai Cikapundung #12' },
+        { id: 'waktu', label: 'Hari, tanggal & jam', type: 'text', placeholder: 'Minggu, 2 Nov 2026, 07.00–10.00' },
+        { id: 'lokasi', label: 'Lokasi / titik kumpul', type: 'text' },
+        { id: 'kuota', label: 'Kuota relawan', type: 'text', placeholder: '50 orang' },
+        { id: 'bawa', label: 'Yang perlu dibawa / disiapkan', type: 'textarea', placeholder: 'Sepatu boot, tumbler, baju ganti...' },
+        { id: 'link', label: 'Link pendaftaran / kontak', type: 'text' },
+        { id: 'catatan', label: 'Info lain (opsional)', type: 'textarea', full: true, placeholder: 'Mitra, fasilitas (snack, sertifikat), dress code...' }
+      ],
+      prompt: v => `Buat paket pengumuman aksi relawan:
+Nama aksi: ${v.aksi}
+Waktu: ${v.waktu || '[waktu]'}
+Lokasi: ${v.lokasi || '[lokasi]'}
+Kuota: ${v.kuota || '[kuota]'}
+Yang dibawa: ${v.bawa || '[perlengkapan]'}
+Pendaftaran: ${v.link || '[link daftar]'}
+${v.catatan ? 'Info lain: ' + v.catatan : ''}
+
+Hasilkan:
+### Teks Poster (judul besar, subjudul, 3–5 poin info)
+### Caption Instagram
+### Script TikTok/Reels 15 detik
+### Thread Threads (3–4 post)
+### Pesan WhatsApp Broadcast
+### Pengingat H-1 untuk peserta terdaftar (WhatsApp)`
+    },
+    {
+      id: 'laporan', ico: '📊', judul: 'Laporan Aksi',
+      desc: 'Ubah data hasil aksi menjadi konten dampak dan laporan untuk mitra.',
+      fields: [
+        { id: 'aksi', label: 'Nama aksi & lokasi', type: 'text', required: true, full: true },
+        { id: 'tanggal', label: 'Tanggal', type: 'text' },
+        { id: 'relawan', label: 'Jumlah relawan', type: 'text' },
+        { id: 'berat', label: 'Total sampah (kg / karung)', type: 'text' },
+        { id: 'mitra', label: 'Mitra / sponsor yang terlibat', type: 'text' },
+        { id: 'rincian', label: 'Rincian jenis sampah (opsional)', type: 'textarea', full: true, placeholder: 'Plastik sachet 40%, styrofoam 15%, popok 10%...' },
+        { id: 'temuan', label: 'Cerita / temuan menarik di lapangan', type: 'textarea', full: true, placeholder: 'Contoh: ditemukan kasur, warga ikut turun ke sungai...' }
+      ],
+      prompt: v => `Buat konten laporan dampak aksi:
+Aksi & lokasi: ${v.aksi}
+Tanggal: ${v.tanggal || '[tanggal]'}
+Relawan: ${v.relawan || '[jumlah relawan]'}
+Total sampah: ${v.berat || '[total kg]'}
+Mitra: ${v.mitra || '-'}
+Rincian: ${v.rincian || '-'}
+Temuan: ${v.temuan || '-'}
+
+Hasilkan:
+### Carousel Instagram (teks per slide, 6–8 slide, angka ditonjolkan)
+### Caption Instagram
+### Thread Threads / X
+### Ringkasan Laporan untuk Mitra & Sponsor (formal, 2–3 paragraf + poin angka)
+### Pesan Terima Kasih untuk Relawan (WhatsApp)
+Pakai HANYA angka yang diberikan.`
+    },
+    { group: 'Kembangkan & Sebarkan' },
+    {
+      id: 'repurpose', ico: '🔁', judul: 'Satu Materi, Banyak Platform',
+      desc: 'Ubah satu naskah, artikel, atau catatan menjadi konten untuk beberapa platform.',
+      fields: [
+        { id: 'materi', label: 'Materi asal', type: 'textarea', required: true, full: true, placeholder: 'Tempel naskah, artikel, atau catatan di sini...' },
+        { id: 'target', label: 'Ubah menjadi', type: 'checks', full: true, options: ['Carousel Instagram', 'Caption Instagram', 'Script TikTok', 'Thread Threads', 'Thread X', 'Post LinkedIn', 'Pesan WhatsApp', 'Newsletter / Email'], value: ['Carousel Instagram', 'Script TikTok', 'Thread Threads'] }
+      ],
+      prompt: v => `Dari materi berikut:
+"""${v.materi}"""
+
+Adaptasikan menjadi: ${v.target.join(', ')}.
+Buat satu bagian "### [nama format]" untuk tiap format, dengan gaya khas platform tersebut (LinkedIn lebih profesional, TikTok bahasa lisan, Threads singkat dan ngobrol).`
+    },
+    {
+      id: 'hook', ico: '🪝', judul: 'Hook Pembuka',
+      desc: 'Kalimat pembuka 3 detik pertama yang bikin orang berhenti scroll.',
+      fields: [
+        { id: 'topik', label: 'Topik konten', type: 'text', required: true, full: true, placeholder: 'Contoh: sampah sachet dari dapur kita berakhir di sungai' },
+        { id: 'platform', label: 'Platform', type: 'select', options: ['TikTok / Reels', 'YouTube', 'Threads (kalimat pertama)'] }
+      ],
+      prompt: v => `Buat 12 hook pembuka untuk topik "${v.topik}" (platform: ${v.platform}).
+Kelompokkan:
+### Temuan mengejutkan di sungai (3)
+### Rasa penasaran (3)
+### POV / sudut pandang personal (2)
+### Melawan anggapan umum (2)
+### Ajakan langsung (2)
+Tiap hook maks. 15 kata, tambahkan saran visual singkat dalam [ ]. Jangan menakut-nakuti berlebihan atau menyalahkan penonton.`
+    },
+    {
+      id: 'judul', ico: '🖼️', judul: 'Judul & Thumbnail',
+      desc: 'Variasi judul dan konsep visual thumbnail/cover.',
+      fields: [
+        { id: 'ringkasan', label: 'Ringkasan isi video', type: 'textarea', required: true, full: true }
+      ],
+      prompt: v => `Ringkasan video:
+"""${v.ringkasan}"""
+
+### 6 Variasi Judul (bikin penasaran tapi jujur, tidak clickbait palsu)
+### 3 Konsep Thumbnail / Cover (objek utama, teks besar maks. 4 kata, warna, ekspresi)
+### Rekomendasi (judul + thumbnail mana yang paling kuat dan kenapa)`
+    },
+    {
+      id: 'seo', ico: '🔎', judul: 'SEO YouTube',
+      desc: 'Judul, deskripsi, chapter, tag, dan hashtag YouTube.',
+      fields: [
+        { id: 'naskah', label: 'Naskah / catatan video', type: 'textarea', required: true, full: true }
+      ],
+      prompt: v => `Dari naskah/catatan video berikut:
+"""${v.naskah}"""
+
+Buat paket YouTube:
+### Judul (dioptimasi pencarian, maks. 70 karakter) — beri 3 opsi
+### Deskripsi (paragraf pembuka berisi kata kunci, ajakan ikut aksi/donasi, placeholder link sosial media & pendaftaran relawan)
+### Chapter / Timestamp perkiraan
+### 15 Tag
+### 5 Hashtag`
+    },
+    {
+      id: 'mitra', ico: '🤝', judul: 'Pesan Kemitraan',
+      desc: 'Email atau pesan untuk mengajak perusahaan, sekolah, atau komunitas bekerja sama.',
+      fields: [
+        { id: 'sasaran', label: 'Sasaran', type: 'select', options: ['Perusahaan (CSR / employee volunteering)', 'Sekolah / Kampus', 'Komunitas lain', 'Pemerintah / Kelurahan', 'Media'] },
+        { id: 'nama', label: 'Nama lembaga sasaran', type: 'text' },
+        { id: 'ajakan', label: 'Bentuk kerja sama yang diajak', type: 'text', required: true, full: true, placeholder: 'Contoh: aksi bersih sungai bersama 50 karyawan + donasi karung' },
+        { id: 'detail', label: 'Detail pendukung (opsional)', type: 'textarea', full: true, placeholder: 'Rekam jejak, data aksi sebelumnya, kontak PIC...' }
+      ],
+      prompt: v => `Tulis pesan kemitraan untuk ${v.sasaran}${v.nama ? ' (' + v.nama + ')' : ''}.
+Ajakan: ${v.ajakan}
+${v.detail ? 'Detail: ' + v.detail : ''}
+
+Hasilkan:
+### Email / Surat Singkat (subjek + isi, profesional, 200–300 kata)
+### Pesan WhatsApp Pembuka (singkat, sopan)
+### Poin Manfaat untuk Mitra (5 poin)
+### Pesan Follow-up (jika belum dibalas 1 minggu)`
+    }
+  ],
+
+  bs: [
+    {
+      id: 'ide', ico: '💡', judul: 'Ide Postingan',
+      desc: 'Bingung mau posting apa? Pilih tujuannya, AI kasih idenya.',
+      fields: [
+        { id: 'tujuan', label: 'Tujuan', type: 'select', options: ['Cari nasabah baru', 'Kenalkan bank sampah ke warga Bandung', 'Ajari cara pilah sampah', 'Cerita nasabah & pengurus', 'Info harga & jadwal', 'Cari ciri khas bank sampah kami'] },
+        { id: 'jumlah', label: 'Jumlah ide', type: 'select', options: ['5', '10'], value: '5' }
+      ],
+      prompt: v => `Beri ${v.jumlah} ide postingan untuk bank sampah ini. Tujuan: ${v.tujuan}.
+Untuk setiap ide:
+### [nomor]. [Judul ide]
+- **Cocok di:** Instagram / TikTok / Threads
+- **Isinya:** 1–2 kalimat sederhana
+- **Cara bikinnya:** apa yang perlu difoto/direkam pakai HP
+${v.tujuan.startsWith('Cari ciri khas') ? 'Mulai jawaban dengan 3 usulan ciri khas (niche) bank sampah warga yang bisa dipilih, lalu ide postingannya.' : ''}`
+    },
+    {
+      id: 'posting', ico: '✍️', judul: 'Bikin Postingan',
+      desc: 'Tulis topiknya, pilih platform, langsung jadi.',
+      fields: [
+        { id: 'topik', label: 'Mau bahas apa?', type: 'textarea', required: true, full: true, placeholder: 'Contoh: cara memilah botol plastik sebelum disetor' },
+        { id: 'platform', label: 'Untuk', type: 'radios', full: true, options: ['Instagram', 'TikTok', 'Threads'], value: 'Instagram' }
+      ],
+      prompt: v => {
+        const format = {
+          'Instagram': '### Teks Slide Carousel (4–6 slide, kalimat pendek)\n### Caption (dengan ajakan di akhir)\n### Hashtag',
+          'TikTok': '### Script 30 detik (tabel: | Detik | Ucapan | Yang direkam |)\n### Teks di layar\n### Caption singkat + hashtag',
+          'Threads': '### Thread (3–5 post pendek, gaya ngobrol, post terakhir berisi ajakan)'
+        }[v.platform];
+        return `Buat postingan ${v.platform} tentang: ${v.topik}\n\nHasilkan:\n${format}`;
+      }
+    },
+    {
+      id: 'nasabah', ico: '🙋', judul: 'Ajak Jadi Nasabah',
+      desc: 'Konten ajakan supaya warga mau menabung sampah.',
+      fields: [
+        { id: 'sasaran', label: 'Siapa yang diajak?', type: 'select', options: ['Tetangga sekitar', 'Warga Bandung yang belum tahu bank sampah', 'Ibu-ibu PKK & pengajian', 'Anak muda & mahasiswa'] },
+        { id: 'alasan', label: 'Alasan utama yang ditonjolkan', type: 'select', options: ['Sampah jadi tabungan', 'Rumah & lingkungan lebih bersih', 'Bantu sungai Bandung bersih', 'Caranya gampang'] }
+      ],
+      prompt: v => `Buat konten ajakan menjadi nasabah bank sampah.
+Sasaran: ${v.sasaran}. Alasan utama: ${v.alasan}.
+Sertakan langkah daftar/setor yang sederhana (pakai [isi ...] untuk info yang belum diketahui).
+
+Hasilkan:
+### Instagram (teks 4 slide + caption)
+### TikTok (script 20–30 detik, tabel: | Detik | Ucapan | Yang direkam |)
+### Threads (3 post)`
+    },
+    {
+      id: 'kabar', ico: '📢', judul: 'Kabar Bank Sampah',
+      desc: 'Hasil timbang, daftar harga, jadwal, atau ucapan terima kasih.',
+      fields: [
+        { id: 'jenis', label: 'Jenis kabar', type: 'select', options: ['Hasil penimbangan', 'Daftar harga sampah', 'Jadwal & lokasi setor', 'Terima kasih untuk nasabah', 'Nasabah baru bergabung'] },
+        { id: 'data', label: 'Datanya', type: 'textarea', required: true, full: true, placeholder: 'Contoh: Sabtu kemarin 23 nasabah setor, total 148 kg, terbanyak kardus 60 kg...' }
+      ],
+      prompt: v => `Buat kabar bank sampah. Jenis: ${v.jenis}.
+Data: ${v.data}
+Pakai HANYA angka yang diberikan. Buat terasa hangat dan bikin warga lain ingin ikut.
+
+Hasilkan:
+### Instagram (teks 1–3 slide + caption)
+### TikTok (script 15–20 detik)
+### Threads (1–2 post)`
+    }
+  ]
+};
+
+const INFO_BS = [
+  { id: 'nama', label: 'Nama bank sampah', placeholder: 'Bank Sampah ...' },
+  { id: 'lokasi', label: 'Lokasi (RW / kelurahan)', placeholder: 'RW 05, Kel. ...' },
+  { id: 'jadwal', label: 'Jadwal timbang', placeholder: 'Sabtu, 08.00–11.00' },
+  { id: 'kontak', label: 'Kontak / akun IG', placeholder: '08xx / @banksampah...' }
+];
+
+/* =====================================================================
+   PENYIMPANAN (localStorage, aman kalau tidak tersedia)
+   ===================================================================== */
+const simpan = {
+  get(k, def) { try { const v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); } catch { return def; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+
+let mode = simpan.get('sk_mode', 'rc');
+let fiturAktif = null;
+
+/* =====================================================================
+   TAMPILAN
+   ===================================================================== */
+function gantiMode(m) {
+  mode = m;
+  simpan.set('sk_mode', m);
+  document.body.className = 'mode-' + m;
+  document.getElementById('logo').textContent = KONTEKS[m].logo;
+  document.getElementById('brand-sub').textContent = KONTEKS[m].nama;
+  document.querySelectorAll('.switch button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  const pertama = FITUR[m].find(f => f.id);
+  bukaFitur(pertama.id);
+}
+
+function renderMenu() {
+  const nav = document.getElementById('menu');
+  const items = FITUR[mode].map(f => f.group
+    ? `<div class="group">${f.group}</div>`
+    : `<button class="${f.id === fiturAktif ? 'on' : ''}" onclick="bukaFitur('${f.id}')"><span class="ico">${f.ico}</span>${f.judul}</button>`);
+  items.push(`<div class="group">Lainnya</div>`);
+  items.push(`<button class="${fiturAktif === 'riwayat' ? 'on' : ''}" onclick="bukaFitur('riwayat')"><span class="ico">🗂️</span>Riwayat</button>`);
+  nav.innerHTML = items.join('');
+}
+
+function bukaFitur(id) {
+  fiturAktif = id;
+  renderMenu();
+  const panel = document.getElementById('panel');
+  if (id === 'riwayat') { panel.innerHTML = renderRiwayat(); return; }
+  const f = FITUR[mode].find(x => x.id === id);
+  panel.innerHTML = `
+    ${mode === 'bs' ? renderInfoBS() : ''}
+    <div class="card">
+      <h2>${f.ico} ${f.judul}</h2>
+      <p class="desc">${f.desc}</p>
+      <div class="grid">${f.fields.map(renderField).join('')}</div>
+      <button class="primary" id="btn-go" onclick="jalankan()">✨ Buatkan</button>
+    </div>
+    <div class="card" id="hasil" hidden></div>`;
+  window.scrollTo({ top: 0 });
+}
+
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+function renderField(fd) {
+  const req = fd.required ? ' <span class="req">*</span>' : '';
+  const cls = 'field' + (fd.full ? ' full' : '');
+  const id = 'f-' + fd.id;
+  let input;
+  if (fd.type === 'select') {
+    input = `<select id="${id}">${fd.options.map(o => `<option ${o === fd.value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+  } else if (fd.type === 'textarea') {
+    input = `<textarea id="${id}" rows="3" placeholder="${esc(fd.placeholder)}"></textarea>`;
+  } else if (fd.type === 'checks' || fd.type === 'radios') {
+    const t = fd.type === 'checks' ? 'checkbox' : 'radio';
+    const sel = [].concat(fd.value || []);
+    input = `<div class="${fd.type}">${fd.options.map(o => `<label><input type="${t}" name="${id}" value="${esc(o)}" ${sel.includes(o) ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>`;
+    return `<div class="${cls}"><label>${fd.label}${req}</label>${input}</div>`;
+  } else {
+    input = `<input type="text" id="${id}" placeholder="${esc(fd.placeholder)}">`;
+  }
+  return `<div class="${cls}"><label for="${id}">${fd.label}${req}</label>${input}</div>`;
+}
+
+function renderInfoBS() {
+  const info = simpan.get('sk_info_bs', {});
+  const terisi = INFO_BS.some(x => info[x.id]);
+  return `<details class="info" ${terisi ? '' : 'open'}>
+    <summary>🏠 Info bank sampah kami ${terisi ? '— ' + esc(info.nama || 'tersimpan') : '(opsional, isi sekali saja)'}</summary>
+    <div class="grid">${INFO_BS.map(x => `<div class="field"><label for="i-${x.id}">${x.label}</label><input id="i-${x.id}" value="${esc(info[x.id])}" placeholder="${esc(x.placeholder)}" onchange="simpanInfoBS()"></div>`).join('')}</div>
+  </details>`;
+}
+
+function simpanInfoBS() {
+  const info = {};
+  INFO_BS.forEach(x => { info[x.id] = document.getElementById('i-' + x.id).value.trim(); });
+  simpan.set('sk_info_bs', info);
+  toast('Info bank sampah disimpan');
+}
+
+/* =====================================================================
+   JALANKAN FITUR
+   ===================================================================== */
+function ambilNilai(f) {
+  const v = {};
+  for (const fd of f.fields) {
+    const id = 'f-' + fd.id;
+    if (fd.type === 'checks') v[fd.id] = [...document.querySelectorAll(`input[name="${id}"]:checked`)].map(i => i.value);
+    else if (fd.type === 'radios') v[fd.id] = (document.querySelector(`input[name="${id}"]:checked`) || {}).value || '';
+    else v[fd.id] = document.getElementById(id).value.trim();
+    const kosong = Array.isArray(v[fd.id]) ? !v[fd.id].length : !v[fd.id];
+    if (fd.required && kosong) { toast(`"${fd.label}" wajib diisi`); return null; }
+  }
+  return v;
+}
+
+function konteksSistem() {
+  let teks = KONTEKS[mode].teks;
+  if (mode === 'bs') {
+    const info = simpan.get('sk_info_bs', {});
+    const baris = INFO_BS.filter(x => info[x.id]).map(x => `- ${x.label}: ${info[x.id]}`);
+    if (baris.length) teks += `\n\nINFO BANK SAMPAH INI\n${baris.join('\n')}`;
+  }
+  return teks + '\n' + ATURAN_FORMAT;
+}
+
+async function jalankan() {
+  const f = FITUR[mode].find(x => x.id === fiturAktif);
+  const v = ambilNilai(f);
+  if (!v) return;
+  const btn = document.getElementById('btn-go');
+  const box = document.getElementById('hasil');
+  btn.disabled = true;
+  box.hidden = false;
+  box.innerHTML = '<div class="loading"><span class="spin"></span>Sedang menyiapkan konten...</div>';
+  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  try {
+    const teks = await panggilAI(konteksSistem(), f.prompt(v));
+    tampilkanHasil(box, f.judul, teks);
+    simpanRiwayat(f, v, teks);
+  } catch (e) {
+    box.innerHTML = `<p class="err">⚠️ ${esc(e.message)}</p>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function tampilkanHasil(box, judul, teks) {
+  box.innerHTML = `
+    <div class="result-head">
+      <h3>Hasil: ${esc(judul)}</h3>
+      <button class="ghost" onclick="salin(this)">📋 Salin</button>
+    </div>
+    <div class="out">${markdown(teks)}</div>`;
+  box.querySelector('button').dataset.teks = teks;
+}
+
+function salin(btn) {
+  const teks = btn.dataset.teks;
+  const ok = () => toast('Tersalin ✓');
+  if (navigator.clipboard) navigator.clipboard.writeText(teks).then(ok, () => salinCadangan(teks, ok));
+  else salinCadangan(teks, ok);
+}
+function salinCadangan(teks, ok) {
+  const ta = document.createElement('textarea');
+  ta.value = teks; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); ok(); } catch {}
+  ta.remove();
+}
+
+/* =====================================================================
+   PANGGIL GEMINI
+   ===================================================================== */
+const MODEL_DEFAULT = ['gemini-flash-latest', 'gemini-2.5-flash'];
+
+async function panggilAI(sistem, prompt) {
+  const key = simpan.get('sk_key', '');
+  const custom = simpan.get('sk_model', '');
+  const models = custom ? [custom] : MODEL_DEFAULT;
+  const body = JSON.stringify({
+    systemInstruction: { parts: [{ text: sistem }] },
+    contents: [{ role: 'user', parts: [{ text: prompt }] }]
+  });
+
+  let pesanTerakhir = '';
+  for (const model of models) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+    for (let coba = 0; coba < 3; coba++) {
+      let res;
+      try {
+        res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+      } catch {
+        throw new Error('Tidak bisa terhubung ke internet / Gemini. Cek koneksi lalu coba lagi.');
+      }
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        const teks = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
+        if (teks) return teks;
+        throw new Error('AI tidak memberi jawaban. Coba ubah isian lalu ulangi.');
+      }
+      pesanTerakhir = data.error?.message || `HTTP ${res.status}`;
+      if (res.status === 429 || res.status >= 500) { await new Promise(r => setTimeout(r, 1500 * (coba + 1))); continue; }
+      if (res.status === 404) break; // model tidak ada, coba model berikutnya
+      if (res.status === 400 || res.status === 401 || res.status === 403) {
+        if (!key) throw new Error('API key belum diisi. Klik ⚙️ di kanan atas untuk mengisinya.');
+        throw new Error('API key ditolak: ' + pesanTerakhir);
+      }
+      throw new Error(pesanTerakhir);
+    }
+  }
+  throw new Error('Gagal memanggil AI: ' + pesanTerakhir + ' (coba isi nama model di ⚙️ Pengaturan)');
+}
+
+/* =====================================================================
+   RIWAYAT
+   ===================================================================== */
+function simpanRiwayat(f, v, teks) {
+  const semua = simpan.get('sk_riwayat_' + mode, []);
+  const ringkas = Object.values(v).flat().filter(Boolean).join(' · ').slice(0, 80);
+  semua.unshift({ judul: f.judul, ico: f.ico, ringkas, teks, waktu: new Date().toISOString() });
+  simpan.set('sk_riwayat_' + mode, semua.slice(0, 30));
+}
+
+function renderRiwayat() {
+  const semua = simpan.get('sk_riwayat_' + mode, []);
+  const daftar = semua.map((r, i) => `
+    <details class="hist-item">
+      <summary><span>${r.ico} <b>${esc(r.judul)}</b> — ${esc(r.ringkas)}</span><span>${new Date(r.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</span></summary>
+      <div class="hist-body">
+        <div class="result-head"><span></span><button class="ghost" data-i="${i}" onclick="salinRiwayat(this)">📋 Salin</button></div>
+        <div class="out">${markdown(r.teks)}</div>
+      </div>
+    </details>`).join('');
+  return `<div class="card">
+    <div class="result-head"><h2>🗂️ Riwayat ${esc(KONTEKS[mode].nama)}</h2>
+      <span>${semua.length ? '<button class="ghost" onclick="eksporRiwayat()">⬇️ Unduh</button> <button class="ghost danger" onclick="hapusRiwayat()">Hapus</button>' : ''}</span></div>
+    <p class="desc">30 hasil terakhir tersimpan di browser ini.</p>
+    ${daftar || '<div class="empty">Belum ada hasil. Coba salah satu fitur dulu.</div>'}
+  </div>`;
+}
+
+function salinRiwayat(btn) {
+  btn.dataset.teks = simpan.get('sk_riwayat_' + mode, [])[btn.dataset.i].teks;
+  salin(btn);
+}
+
+function eksporRiwayat() {
+  const semua = simpan.get('sk_riwayat_' + mode, []);
+  const isi = semua.map(r => `# ${r.judul} — ${new Date(r.waktu).toLocaleString('id-ID')}\n${r.ringkas}\n\n${r.teks}`).join('\n\n---\n\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([isi], { type: 'text/markdown' }));
+  a.download = `riwayat-${mode === 'rc' ? 'river-cleanup' : 'bank-sampah'}-${new Date().toISOString().slice(0, 10)}.md`;
+  a.click();
+}
+
+function hapusRiwayat() {
+  if (!confirm('Hapus semua riwayat ' + KONTEKS[mode].nama + '?')) return;
+  simpan.set('sk_riwayat_' + mode, []);
+  bukaFitur('riwayat');
+}
+
+/* =====================================================================
+   MARKDOWN SEDERHANA → HTML (aman: semua teks di-escape dulu)
+   ===================================================================== */
+function inline(s) {
+  return esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<i>$2</i>');
+}
+
+function markdown(md) {
+  const baris = md.replace(/\r/g, '').split('\n');
+  let html = '', list = null, i = 0;
+  const tutupList = () => { if (list) { html += `</${list}>`; list = null; } };
+  while (i < baris.length) {
+    const b = baris[i];
+    if (/^\s*\|.*\|\s*$/.test(b)) {
+      tutupList();
+      const rows = [];
+      while (i < baris.length && /^\s*\|.*\|\s*$/.test(baris[i])) { rows.push(baris[i]); i++; }
+      const sel = r => r.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+      const isi = rows.filter(r => !/^\s*\|[\s:|-]+\|\s*$/.test(r)).map(sel);
+      if (isi.length) {
+        html += '<div class="tbl"><table><tr>' + isi[0].map(c => `<th>${inline(c)}</th>`).join('') + '</tr>' +
+          isi.slice(1).map(r => '<tr>' + r.map(c => `<td>${inline(c)}</td>`).join('') + '</tr>').join('') + '</table></div>';
+      }
+      continue;
+    }
+    let m;
+    if ((m = b.match(/^\s*#{1,6}\s+(.*)/))) { tutupList(); html += `<h3>${inline(m[1])}</h3>`; }
+    else if (/^\s*(-{3,}|\*{3,})\s*$/.test(b)) { tutupList(); html += '<hr>'; }
+    else if ((m = b.match(/^\s*[-*•]\s+(.*)/))) { if (list !== 'ul') { tutupList(); html += '<ul>'; list = 'ul'; } html += `<li>${inline(m[1])}</li>`; }
+    else if ((m = b.match(/^\s*\d+[.)]\s+(.*)/))) { if (list !== 'ol') { tutupList(); html += '<ol>'; list = 'ol'; } html += `<li>${inline(m[1])}</li>`; }
+    else if (!b.trim()) { tutupList(); }
+    else { tutupList(); html += `<p>${inline(b)}</p>`; }
+    i++;
+  }
+  tutupList();
+  return html;
+}
+
+/* =====================================================================
+   PENGATURAN & TOAST
+   ===================================================================== */
+function bukaPengaturan() {
+  document.getElementById('set-key').value = simpan.get('sk_key', '');
+  document.getElementById('set-model').value = simpan.get('sk_model', '');
+  document.getElementById('modal').classList.add('show');
+}
+function tutupPengaturan() { document.getElementById('modal').classList.remove('show'); }
+function simpanPengaturan() {
+  simpan.set('sk_key', document.getElementById('set-key').value.trim());
+  simpan.set('sk_model', document.getElementById('set-model').value.trim());
+  tutupPengaturan();
+  toast('Pengaturan disimpan');
+}
+
+let toastTimer;
+function toast(pesan) {
+  const t = document.getElementById('toast');
+  t.textContent = pesan;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+gantiMode(mode);
+if (!simpan.get('sk_key', '')) setTimeout(() => toast('Tip: isi Gemini API key di ⚙️ dulu'), 600);
+</script>
+</body>
+</html>
